@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/Content/Site.css"/>
+    <title>Web Prodavnica</title>
+    
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo-div"><div id="logo">Logo/Home</div></div>
+        <div id="profile"></div>
+    </div>
+    <hr class="navbar-divider" />
+    <script src="~/Scripts/jquery/jquery.js">
+    </script>
+    <script>
+        let logedIn;
+        $(function () {
+            logedIn = sessionStorage.getItem("logedIn");
+            if (logedIn) {
+                if (logedIn == "korisnik") {
+                    $("#profile").prepend("K")
+                } else if (logedIn == "prodavac") {
+                    $("#profile").prepend("P")
+                } else if (logedIn == "administrator") {
+                    $("#profile").prepend("A")
+                }
+            }
+        });
+        $("#profile").on("click", function () {
+            if (logedIn) {
+                document.location.href = "Profil";
+            } else {
+                document.location.href = "LogIn";
+            }
+        });
+        $("#logo").on("click", function () {
+            document.location.href = "/";
+        });
+    </script>
+    @RenderBody()
+</body>
+</html>

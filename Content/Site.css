@@ -1,0 +1,78 @@
+﻿body{
+    overflow-x: hidden;
+}
+*, ::before, ::after{
+    padding: 0;
+    margin: 0;
+    font-size: 62.5%;
+}
+.navbar {
+    background-color: #fff;
+    display: flex;
+    justify-content: flex-end;
+    align-content: center;
+    width: 100%;
+    height: 5rem;
+    padding: 0.5rem;
+}
+.logo-div{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0.2rem;
+}
+#logo{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background-color: red;
+    width: 10rem;
+    height: 100%;
+    margin-left: 3rem;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+#profile {
+    background-color: black;
+    border-radius: 50%;
+    width: 3.5rem;
+    height: 3.5rem;
+    padding: 0.5rem;
+    margin-right: 3rem;
+    color: #fff;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.navbar-divider {
+    width: 95%;
+    margin: auto;
+    height: 0.2rem;
+    background-color: #000;
+}
+.flex-container{
+    padding-top: 1rem;
+    display:flex;
+    flex-direction: row;
+    width: 100%;
+    height: calc(100vh - 7.4rem);
+}
+.filter{
+    width: 25%;
+    height: 100%;
+    background-color: red;
+}
+.products{
+    width: 75%;
+    height: 100%;
+    background-color: blue;
+}
