@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -12,47 +14,84 @@ namespace WebProjekat.Controllers
     {
         public List<Proizvod> Get()
         {
-            return BazaProizvoda.ProcitajProizvode();
+            return ProcitajBazu();
         }
-
-        // GET api/<controller>/5
         public Proizvod Get(string naziv)
         {
-            return BazaProizvoda.Proizvodi[naziv];
+            return PronadjiProizvod(naziv);
+        }
+        public IHttpActionResult Post(Proizvod k)
+        {
+            if (DodajProizvod(k))
+            {
+                return Ok("Uspesno dodat Proizvod");
+            }
+            return BadRequest("Proizvod vec postoji");
+        }
+        public IHttpActionResult Delete(string korisnicko_ime)
+        {
+            if (ObrisiProizvod(korisnicko_ime))
+            {
+                return Ok("Uspesno obrisan Proizvod");
+            }
+            return BadRequest("Proizvod ne postoji");
         }
 
-        // POST api/<controller>
-        public IHttpActionResult Post(Proizvod proizvod)
+
+        private string dbPath = "";
+
+        private List<Proizvod> ProcitajBazu()
         {
-            if(proizvod == null)
-            {
-                return BadRequest();
-            }
-            if(proizvod.Naziv == "" || proizvod.Naziv == null)
-            {
-                return BadRequest();
-            }
-            return Ok(BazaProizvoda.DodajProizvod(proizvod));
+            string procitanaBaza = File.ReadAllText(dbPath);
+            return JsonConvert.DeserializeObject<List<Proizvod>>(procitanaBaza);
         }
 
-        // PUT api/<controller>/5
-        public IHttpActionResult Put(Proizvod proizvod)
+        private void SacuvajBazu(List<Proizvod> baza)
         {
-            if (proizvod == null)
-            {
-                return BadRequest();
-            }
-            if (proizvod.Naziv == "" || proizvod.Naziv == null)
-            {
-                return BadRequest();
-            }
-            return Ok(BazaProizvoda.AzurirajProizvod(proizvod));
+            string jsonProizvoda = JsonConvert.SerializeObject(baza, Formatting.Indented);
+            File.WriteAllText(dbPath, jsonProizvoda);
         }
 
-        // DELETE api/<controller>/5
-        public void Delete(string naziv)
+        private bool DodajProizvod(Proizvod k)
         {
-            BazaProizvoda.ObrisiProizvod(naziv);
+            var baza = ProcitajBazu();
+            if (baza.Contains(k))
+            {
+                return false;
+            }
+            else
+            {
+                baza.Add(k);
+                SacuvajBazu(baza);
+                return true;
+            }
+        }
+        private bool ObrisiProizvod(string naziv)
+        {
+            var baza = ProcitajBazu();
+            var tmp = baza;
+            foreach (var k in tmp)
+            {
+                if (k.Naziv == naziv)
+                {
+                    baza.Remove(k);
+                    SacuvajBazu(baza);
+                    return true;
+                }
+            }
+            return false;
+        }
+        private Proizvod PronadjiProizvod(string naziv)
+        {
+            var baza = ProcitajBazu();
+            foreach (var k in baza)
+            {
+                if (k.Naziv == naziv)
+                {
+                    return k;
+                }
+            }
+            return null;
         }
     }
 }

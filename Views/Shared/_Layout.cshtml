@@ -8,13 +8,14 @@
     
 </head>
 <body>
+    <script src="~/Scripts/jquery/jquery.js">
+    </script>
     <div class="navbar">
         <div class="logo-div"><div id="logo">Logo/Home</div></div>
         <div id="profile"></div>
     </div>
     <hr class="navbar-divider" />
-    <script src="~/Scripts/jquery/jquery.js">
-    </script>
+    @RenderBody()
     <script>
         let logedIn;
         $(function () {
@@ -40,6 +41,5 @@
             document.location.href = "/";
         });
     </script>
-    @RenderBody()
 </body>
 </html>

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -10,58 +12,87 @@ namespace WebProjekat.Controllers
 {
     public class BazaKorisnikaController : ApiController
     {
-        // GET api/<controller>
+
         public List<Korisnik> Get()
         {
-            return BazaKorisnika.ProcitajKorisnike();
+            return ProcitajBazu();
         }
-
-        // GET api/<controller>/5
         public Korisnik Get(string korisnicko_ime)
         {
-            return BazaKorisnika.Korisnici[korisnicko_ime];
+            return PronadjiKorisnika(korisnicko_ime);
+        }
+        public IHttpActionResult Post(Korisnik k)
+        {
+            if (DodajKorisnika(k))
+            {
+                return Ok("Uspesno dodat korisnik");
+            }
+            return BadRequest("Korisnik vec postoji");
+        }
+        public IHttpActionResult Delete(string korisnicko_ime)
+        {
+            if (ObrisiKorisnika(korisnicko_ime))
+            {
+                return Ok("Uspesno obrisan korisnik");
+            }
+            return BadRequest("Korisnik ne postoji");
         }
 
-        // POST api/<controller>
-        public IHttpActionResult Post(Korisnik korisnik)
+
+        private string dbPath = "";
+
+        private List<Korisnik> ProcitajBazu()
         {
-            if(korisnik == null)
-            {
-                return BadRequest();
-            }
-            if(korisnik.Korisnicko_ime =="" || korisnik.Korisnicko_ime == null)
-            {
-                return BadRequest();
-            }
-            if(korisnik.Lozinka == "" || korisnik.Lozinka == null)
-            {
-                return BadRequest();
-            }
-            return Ok(BazaKorisnika.DodajKorisnika(korisnik));
+            string procitanaBaza = File.ReadAllText(dbPath);
+            return JsonConvert.DeserializeObject<List<Korisnik>>(procitanaBaza);
+        }
+        
+        private void SacuvajBazu(List<Korisnik> baza)
+        {
+            string jsonKorisnika = JsonConvert.SerializeObject(baza, Formatting.Indented);
+            File.WriteAllText(dbPath, jsonKorisnika);
         }
 
-        // PUT api/<controller>/5
-        public IHttpActionResult Put(Korisnik korisnik)
+        private bool DodajKorisnika(Korisnik k)
         {
-            if (korisnik == null)
+            var baza = ProcitajBazu();
+            if (baza.Contains(k))
             {
-                return BadRequest();
+                return false;
             }
-            if (korisnik.Korisnicko_ime == "" || korisnik.Korisnicko_ime == null)
+            else
             {
-                return BadRequest();
+                baza.Add(k);
+                SacuvajBazu(baza);
+                return true;
             }
-            if (korisnik.Lozinka == "" || korisnik.Lozinka == null)
-            {
-                return BadRequest();
-            }
-            return Ok(BazaKorisnika.AzurirajKorisnika(korisnik));
         }
-
-        // DELETE api/<controller>/5
-        public void Delete(string korisnicko_ime)
+        private bool ObrisiKorisnika(string korisnicko_ime)
         {
-            BazaKorisnika.ObrisiKorisnika(korisnicko_ime);
+            var baza = ProcitajBazu();
+            var tmp = baza;
+            foreach(var k in tmp)
+            {
+                if(k.Korisnicko_ime == korisnicko_ime)
+                {
+                    baza.Remove(k);
+                    SacuvajBazu(baza);
+                    return true;
+                }
+            }
+            return false;
+        }
+        private Korisnik PronadjiKorisnika(string korisnicko_ime)
+        {
+            var baza = ProcitajBazu();
+            foreach(var k in baza)
+            {
+                if(k.Korisnicko_ime == korisnicko_ime)
+                {
+                    return k;
+                }
+            }
+            return null;
         }
     }
 }
