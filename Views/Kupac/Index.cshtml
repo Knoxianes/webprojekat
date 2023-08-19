@@ -1,0 +1,141 @@
+﻿<div style="height: calc(100vh - 7.4rem); display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 0.5rem; font-size: 2rem;">
+    <form id="kupac-form" style="display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-start; gap:0.5rem; margin-left: 20px;">
+        <h1 style="font-size: 3rem; padding: 2px;">Profil</h1>
+        <label style="font-size: 2rem; padding: 2px;  ">Korisnicko ime: <input type="text" id="kupac-username" style="font-size: 1.5rem; padding: 2px" disabled /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Sifra: <input type="password" id="kupac-password" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Ime: <input type="text" id="kupac-name" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Prezime: <input type="text" id="kupac-lastname" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">
+            Pol:
+            <select style="font-size: 1.5rem; padding: 2px" id="kupac-gender" required>
+                <option value="MUSKI">Muski</option>
+                <option value="ZENSKI">Zenski</option>
+            </select>
+        </label>
+        <label style="font-size: 2rem; padding: 2px;  ">Email: <input type="email" id="kupac-email" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Kada ste rodjeni: <input type="date" id="kupac-date" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">
+            Uloga:
+            <select style="font-size: 1.5rem; padding: 2px" id="kupac-role" required>
+                <option value="KUPAC">Kupac</option>
+                <option value="PRODAVAC">Prodavac</option>
+            </select>
+        </label>
+        <button type="submit" id="save_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">Save</button>
+    </form>
+    <div style="display:flex; flex-direction: column; justify-content:center; align-items: center; padding: 3px; gap: 20px;">
+        <div style="display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 5px; align-items: center;">
+            <h2 style="font-size: 2rem">Porudzbine</h2>
+            <div id="porudzbine-kupac-container" style="display: flex; flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: space-evenly; gap: 5px; align-items: center;">
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 5px; align-items: center;">
+            <h2 style="font-size: 2rem">Omiljeni proizvodi</h2>
+            <div id="proizovdi-kupac-container" style="display: flex; flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: space-evenly; gap: 5px; align-items: center;">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    
+    $(window).on("load", function () {
+        let podaci = JSON.parse(window.sessionStorage.getItem("userData"));
+        if (!podaci) {
+            document.location.href = "Home";
+        }
+        console.log(podaci)
+        document.getElementById("kupac-username").value = podaci.Korisnicko_ime;
+        document.getElementById("kupac-password").value = podaci.Lozinka;
+        document.getElementById("kupac-name").value = podaci.Ime;
+        document.getElementById("kupac-lastname").value = podaci.Prezime;
+        document.getElementById("kupac-gender").value = podaci.Pol == 0 ? "MUSKI" : "ZENSKI";
+        document.getElementById("kupac-email").value = podaci.Email;
+        document.getElementById("kupac-date").value = podaci.Rodjendan.slice(0, 10);
+        document.getElementById("kupac-role").value = podaci.Uloga == 0 ? "KUPAC" : "PRODAVAC";
+        let listacardovaporudzbina = "";
+        for (let porudzbina in podaci.ListaPorudzbina) {
+            card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px;">`;
+            card += `<img src=${porudzbina.Proizvod.Slika}></img>`;
+            card += `<p>Naziv: ${porudzbina.Proizvod.Naziv}</p>`;
+            card += `<p>Kolicina: ${porudzbina.Kolicina}</p>`;
+            card += `<p>Cena: ${porudzbina.Proizvod.Cena}</p>`;
+            card += `<p>Status: ${porudzbina.StatusPorudzbine == 0 ? "Aktivan" : porudzbina.StatusPorudzbine == 1 ? "Izvrsen" : "Otkazan"} ${porudzbina.DatumPorudzbine.slice(0, 10)}</p>`;
+            card += "</div>";
+            listacardovaporudzbina += card;
+        }
+        $("#porudzbine-kupac-container").html(listacardovaporudzbina);
+        let listaProizvoda = [];
+        try {
+            $.get('api/BazaProizvoda', function (data, status) {
+                if (data) {
+                    return;
+                }
+                for (let proizvod in data) {
+                    for (let prozivod2 in podaci.ListOmiljenihProizvoda) {
+                        if (proizvod == prozivod2) {
+                            listaProizvoda.push(proizvod);
+                        }
+                    }
+                }
+                
+
+            });
+        } catch (error) {
+            console.log(error)
+        }
+        let listacardovaproizvoda = "";
+        for (let proizvod in listaProizvoda) {
+            card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px;">`;
+            card += `<img src=${proizvod.Proizvod.Slika}></img>`;
+            card += `<p>Naziv: ${proizvod.Proizvod.Naziv}</p>`;
+            card += `<p>Cena: ${proizvod.Proizvod.Cena}</p>`;
+            if (proizvod.Kolicina <= 0) {
+                card += `<p style="color: red;">Proizvod je nedostupan</p>`
+            }
+            card += "</div>";
+            listacardovaproizvoda += card;
+        }
+        $("#proizovdi-kupac-container").html(listacardovaproizvoda);
+
+        
+    });
+    $("#kupac-form").on('submit', function (e) {
+
+        let data = JSON.parse(window.sessionStorage.getItem("userData"));
+        const username = document.getElementById("kupac-username").value;
+        const name = document.getElementById("kupac-name").value;
+        const password = document.getElementById("kupac-password").value;
+        const lastname = document.getElementById("kupac-lastname").value;
+        const gender = document.getElementById("kupac-gender").value;;
+        const email = document.getElementById("kupac-email").value;
+        const date = document.getElementById("kupac-date").value;
+        const role = document.getElementById("kupac-role").value;
+        const Korisnik = {
+            Korisnicko_ime: username,
+            Lozinka: password,
+            Ime: name,
+            Prezime: lastname,
+            Pol: gender,
+            Email: email,
+            Rodjendan: date,
+            Uloga: role,
+            ListaPorudzbina: data.ListaPorudzbina,
+            ListOmiljenihProizvoda: data.ListOmiljenihProizvoda
+        };
+        try {
+            $.ajax({
+                type: "PUT",
+                url: "/api/BazaKorisnika",
+                data: JSON.stringify(Korisnik),
+                contentType: "application/json"
+
+            })
+            window.sessionStorage.setItem("userData", JSON.stringify(Korisnik));
+        } catch (error) {
+            console.log(error);
+        }
+
+    });
+
+</script>
+

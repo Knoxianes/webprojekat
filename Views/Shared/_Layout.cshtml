@@ -21,24 +21,34 @@
         $(function () {
             logedIn = sessionStorage.getItem("logedIn");
             if (logedIn) {
-                if (logedIn == "korisnik") {
+                if (logedIn == 0) {
                     $("#profile").prepend("K")
-                } else if (logedIn == "prodavac") {
+                } else if (logedIn == 1) {
                     $("#profile").prepend("P")
-                } else if (logedIn == "administrator") {
+                } else if (logedIn == 2) {
                     $("#profile").prepend("A")
                 }
             }
         });
         $("#profile").on("click", function () {
-            if (logedIn) {
-                document.location.href = "Profil";
-            } else {
+            if (logedIn == 0)
+            {
+                document.location.href = "Kupac";
+            }
+            else if (logedIn == 1)
+            {
+                document.location.href = "Prodavac";
+            }
+            else if (logedIn == 2) {
+                document.location.href = "Admin";
+            }
+            else
+            {
                 document.location.href = "LogIn";
             }
         });
         $("#logo").on("click", function () {
-            document.location.href = "/";
+            document.location.href = "Home";
         });
     </script>
 </body>

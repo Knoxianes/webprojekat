@@ -55,7 +55,7 @@ namespace WebProjekat.Controllers
         private bool DodajProizvod(Proizvod k)
         {
             var baza = ProcitajBazu();
-            if (baza.Contains(k))
+            if (PronadjiProizvod(k.Naziv) != null)
             {
                 return false;
             }

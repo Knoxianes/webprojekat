@@ -1,10 +1,37 @@
 ﻿<div style="height: calc(100vh - 7.4rem); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.5rem; font-size: 2rem;">
     <h1 style="font-size: 2rem; padding: 2px">LogIn</h1>
-    <label style="font-size: 2rem; padding: 2px; margin-right:5rem;">Korisnicko ime: <input type="text"  style="font-size: 1.5rem; padding: 2px"/></label>
-    <label style="font-size: 2rem; padding: 2px; margin-left:3.5rem">Sifra: <input type="password"  style="font-size: 1.5rem; padding: 2px"/></label>
-    <a href="~/SignUp"> <button style="font-size: 1.5rem; padding: 4px; width: 15rem;">SignUp</button></a>
+    <p id="login_greska" style="display: none; color: red; font-size: 1.5rem">Pogresno korisnicko ime ili lozinka</p>
+    <label style="font-size: 2rem; padding: 2px; margin-right:5rem;">Korisnicko ime: <input type="text" id="korisnicko_ime" style="font-size: 1.5rem; padding: 2px" /></label>
+    <label style="font-size: 2rem; padding: 2px; margin-left:3.5rem">Sifra: <input type="password" id="lozinka" style="font-size: 1.5rem; padding: 2px" /></label>
     <button id="login_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">LogIn</button>
+    <a href="~/SignUp"> <button style="font-size: 1.5rem; padding: 4px; width: 15rem;">SignUp</button></a>
 </div>
 <script>
-
+    $("#login_button").click(function () {
+        try {
+            $("#login_greska").css("display", "none");
+            korisnicko_ime = document.getElementById("korisnicko_ime").value;
+            lozinka = document.getElementById("lozinka").value;
+            $.get(`/api/BazaKorisnika?korisnicko_ime=${korisnicko_ime}`, function (data, status) {
+                if (data === null) {
+                    $("#login_greska").css("display", "block");
+                    $("#korisnicko_ime").css("border-color", "red");
+                    $("#lozinka").css("border-color", "red");
+                } else {
+                    if (data.Lozinka === lozinka) {
+                        sessionStorage.setItem("logedIn", data.Uloga);
+                        sessionStorage.setItem("userData", JSON.stringify(data));
+                        sessionStorage.setItem("logIn", true);
+                        window.location.href = "Home";
+                    } else {
+                        $("#login_greska").css("display", "block");
+                        $("#korisnicko_ime").css("border-color", "red");
+                        $("#lozinka").css("border-color", "red");
+                    }
+                }
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    })
 </script>

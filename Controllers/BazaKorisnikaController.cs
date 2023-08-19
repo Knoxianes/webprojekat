@@ -21,8 +21,20 @@ namespace WebProjekat.Controllers
         {
             return PronadjiKorisnika(korisnicko_ime);
         }
+        public IHttpActionResult Put(Korisnik k)
+        {
+            if (AzurirajKorisnika(k))
+            {
+                return Ok("Uspesno azuriran korisnik");
+            }
+            return BadRequest("Korisnik ne postoji");
+        }
+
+        
+
         public IHttpActionResult Post(Korisnik k)
         {
+            
             if (DodajKorisnika(k))
             {
                 return Ok("Uspesno dodat korisnik");
@@ -39,7 +51,7 @@ namespace WebProjekat.Controllers
         }
 
 
-        private string dbPath = "";
+        private string dbPath = "C:\\Users\\strah\\OneDrive\\Dokumenti\\GitLab\\WebProjekat\\App_Data\\BazaKorisnika.json";
 
         private List<Korisnik> ProcitajBazu()
         {
@@ -53,19 +65,32 @@ namespace WebProjekat.Controllers
             File.WriteAllText(dbPath, jsonKorisnika);
         }
 
+        private bool AzurirajKorisnika(Korisnik k)
+        {
+            var baza = ProcitajBazu();
+            for(int i = 0; i < baza.Count; i++)
+            {
+                if(baza[i].Korisnicko_ime == k.Korisnicko_ime)
+                {
+                    baza[i] = k;
+                    SacuvajBazu(baza);
+                    return true;
+                }
+            }
+            return false;
+
+        }
+
         private bool DodajKorisnika(Korisnik k)
         {
             var baza = ProcitajBazu();
-            if (baza.Contains(k))
+            if(PronadjiKorisnika(k.Korisnicko_ime) != null)
             {
                 return false;
             }
-            else
-            {
-                baza.Add(k);
-                SacuvajBazu(baza);
-                return true;
-            }
+            baza.Add(k);
+            SacuvajBazu(baza);
+            return true;
         }
         private bool ObrisiKorisnika(string korisnicko_ime)
         {

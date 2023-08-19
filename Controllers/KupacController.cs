@@ -6,9 +6,9 @@ using System.Web.Mvc;
 
 namespace WebProjekat.Controllers
 {
-    public class ProfilController : Controller
+    public class KupacController : Controller
     {
-        // GET: Profil
+        // GET: Kupac
         public ActionResult Index()
         {
             return View();

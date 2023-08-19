@@ -1,6 +1,6 @@
 ﻿<div style="height: calc(100vh - 7.4rem); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.5rem; font-size: 2rem;">
     <h1 style="font-size: 2rem; padding: 2px">SignUp</h1>
-    <form method="post" action="/api/BazaKorisnika" style="display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:0.5rem;">
+    <form id="signup-form" style="display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:0.5rem;">
         <label style="font-size: 2rem; padding: 2px;  ">Korisnicko ime: <input type="text" id="username" style="font-size: 1.5rem; padding: 2px" required /></label>
         <label style="font-size: 2rem; padding: 2px;  ">Sifra: <input type="password" id="password" style="font-size: 1.5rem; padding: 2px" required /></label>
         <label style="font-size: 2rem; padding: 2px;  ">Ime: <input type="text" id="name" style="font-size: 1.5rem; padding: 2px" required /></label>
@@ -10,7 +10,6 @@
             <select style="font-size: 1.5rem; padding: 2px" id="gender" required>
                 <option value="MUSKI">Muski</option>
                 <option value="ZENSKI">Zenski</option>
-                <option value="SREDNJI">Srednji</option>
             </select>
         </label>
         <label style="font-size: 2rem; padding: 2px;  ">Email: <input type="email" id="email" style="font-size: 1.5rem; padding: 2px" required /></label>
@@ -24,37 +23,43 @@
         </label>
         <button type="submit" id="signup_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">SignUp</button>
     </form>
-    <a href="~/LogIn"> <button style="font-size: 1.5rem; padding: 4px; width: 15rem;">LogIn</button></a>
+    <a href="~/LogIn"><button style="font-size: 1.5rem; padding: 4px; width: 15rem;">LogIn</button></a>
 </div>
 <script>
-    $("#signup_button").click(function () {
-        const username = $("#username").val();
-        const name = $("#name").val();
-        const password = $("#password").val();
-        const lastname = $("#lastname").val();
-        const username = $("#username").val();
-        const gender = $("#gender").val();
-        const email = $("#email").val();
-        const date = $("#date").val();
-        const role = $("#role").val();
+    $("#signup-form").on('submit', function (e) {
+        e.preventDefault();
+
+        const username = document.getElementById("username").value;
+        const name = document.getElementById("name").value;
+        const password = document.getElementById("password").value;
+        const lastname = document.getElementById("lastname").value;
+        const gender = document.getElementById("gender").value;;
+        const email = document.getElementById("email").value;
+        const date = document.getElementById("date").value;
+        const role = document.getElementById("role").value;
         const Korisnik = {
-            korisnicko_ime: username,
-            lozinka: password,
-            ime: name,
-            prezime: lastname,
-            pol: gender,
-            email: email,
-            rodjendan: date,
-            uloga: role
+            Korisnicko_ime: username,
+            Lozinka: password,
+            Ime: name,
+            Prezime: lastname,
+            Pol: gender,
+            Email: email,
+            Rodjendan: date,
+            Uloga: role
         };
         try {
-            $.post("/api/BazaKorisnika", Korisnik, function (response) {
-                console.log(response);
+            $.ajax({
+                type: "POST",
+                url: "/api/BazaKorisnika",
+                data: JSON.stringify(Korisnik),
+                contentType: "application/json"
+
             })
-            document.location.href = "LogIn";
+            window.location.href = "LogIn";
         } catch (error) {
             console.log(error);
         }
+
     });
 </script>
 

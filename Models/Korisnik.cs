@@ -7,8 +7,7 @@ namespace WebProjekat.Models
     public enum  Pol{
         
         MUSKI,
-        ZENSKI,
-        SREDNJI
+        ZENSKI
     }
     public enum Uloga
     {
@@ -26,20 +25,23 @@ namespace WebProjekat.Models
         private string _email;
         private DateTime _rodjendan;
         private Uloga _uloga;
-        private List<Proizvod> _listaPorudzbina;
-        private List<Porudzbina> _listaOmiljenihProizvoda;
-        private List<Porudzbina> _listaObjavljenihProzivoda;
+        private List<Porudzbina> _listaPorudzbina;
+        private List<Proizvod> _listaOmiljenihProizvoda;
+        private List<Proizvod> _listaObjavljenihProzivoda;
 
         public Korisnik(string korisnicko_ime, string lozinka, string ime, string prezime, Pol pol, string email, DateTime rodjendan, Uloga uloga)
         {
-            _korisnicko_ime = korisnicko_ime;
-            _lozinka = lozinka;
-            _ime = ime;
-            _prezime = prezime;
-            _pol = pol;
-            _email = email;
-            _rodjendan = rodjendan;
-            _uloga = uloga;
+            Korisnicko_ime = korisnicko_ime;
+            Lozinka = lozinka;
+            Ime = ime;
+            Prezime = prezime;
+            Pol = pol;
+            Email = email;
+            Rodjendan = rodjendan;
+            Uloga = uloga;
+            ListaOmiljenihProizvoda = new List<Proizvod>();
+            ListaPorudzbina = new List<Porudzbina>();
+            ListaObjavljenihProzivoda = new List<Proizvod>();
         }
 
         public string Korisnicko_ime { get => _korisnicko_ime; set => _korisnicko_ime = value; }
@@ -50,7 +52,7 @@ namespace WebProjekat.Models
         public string Email { get => _email; set => _email = value; }
         public DateTime Rodjendan { get => _rodjendan; set => _rodjendan = value; }
         public Uloga Uloga { get => _uloga; set => _uloga = value; }
-        public List<Proizvod> ListaPorudzbina { 
+        public List<Porudzbina> ListaPorudzbina { 
             get
             {
                 if(this.Uloga == Uloga.KUPAC)
@@ -64,7 +66,7 @@ namespace WebProjekat.Models
             } 
             set => _listaPorudzbina = value; 
         }
-        public List<Porudzbina> ListaOmiljenihProizvoda 
+        public List<Proizvod> ListaOmiljenihProizvoda 
         {
             get 
             { 
@@ -80,7 +82,7 @@ namespace WebProjekat.Models
             }
             set => _listaOmiljenihProizvoda = value;
         }
-        public List<Porudzbina> ListaObjavljenihProzivoda 
+        public List<Proizvod> ListaObjavljenihProzivoda 
         { 
             get
             {

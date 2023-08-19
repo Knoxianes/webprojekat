@@ -19,7 +19,7 @@ namespace WebProjekat.Models
         private string _slika;
         private DateTime _objavljen;
         private string _grad;
-        private StatusProizvoda _statusProzivoda;
+        private StatusProizvoda _statusProizvoda;
 
         private List<Recenzija> _listaRecenzije;
 
@@ -32,7 +32,8 @@ namespace WebProjekat.Models
             _slika = slika;
             _objavljen = objavljen;
             _grad = grad;
-            _statusProzivoda = status;
+            _statusProizvoda = status;
+            ListaRecenzije = new List<Recenzija>();
         }
 
         public string Naziv { get => _naziv; set => _naziv = value; }
@@ -42,7 +43,7 @@ namespace WebProjekat.Models
         public string Slika { get => _slika; set => _slika = value; }
         public DateTime Objavljen { get => _objavljen; set => _objavljen = value; }
         public string Grad { get => _grad; set => _grad = value; }
-        public StatusProizvoda StatusProzivoda { get => _statusProzivoda; set => _statusProzivoda = value; }
+        public StatusProizvoda StatusProzivoda { get => _statusProizvoda; set => _statusProizvoda = value; }
         public List<Recenzija> ListaRecenzije { get => _listaRecenzije; set => _listaRecenzije = value; }
     }
 }

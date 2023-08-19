@@ -1,3 +1,15 @@
 [
-
+  {
+    "Korisnicko_ime": "Test",
+    "Lozinka": "123",
+    "Ime": "Nikola",
+    "Prezime": "test",
+    "Pol": 0,
+    "Email": "test@gmail.com",
+    "Rodjendan": "2023-08-30T00:00:00",
+    "Uloga": 0,
+    "ListaPorudzbina": [],
+    "ListaOmiljenihProizvoda": [],
+    "ListaObjavljenihProzivoda": null
+  }
 ]
