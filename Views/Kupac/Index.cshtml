@@ -1,4 +1,4 @@
-﻿<div style="height: calc(100vh - 7.4rem); display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 0.5rem; font-size: 2rem;">
+﻿<div style="height: 100%; display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 0.5rem; font-size: 2rem;">
     <form id="kupac-form" style="display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-start; gap:0.5rem; margin-left: 20px;">
         <h1 style="font-size: 3rem; padding: 2px;">Profil</h1>
         <label style="font-size: 2rem; padding: 2px;  ">Korisnicko ime: <input type="text" id="kupac-username" style="font-size: 1.5rem; padding: 2px" disabled /></label>
@@ -38,12 +38,11 @@
 </div>
 <script>
     
-    $(window).on("load", function () {
+    $(window).on("load", async function () {
         let podaci = JSON.parse(window.sessionStorage.getItem("userData"));
         if (!podaci) {
             document.location.href = "Home";
         }
-        console.log(podaci)
         document.getElementById("kupac-username").value = podaci.Korisnicko_ime;
         document.getElementById("kupac-password").value = podaci.Lozinka;
         document.getElementById("kupac-name").value = podaci.Ime;
@@ -54,50 +53,55 @@
         document.getElementById("kupac-role").value = podaci.Uloga == 0 ? "KUPAC" : "PRODAVAC";
         let listacardovaporudzbina = "";
         for (let porudzbina in podaci.ListaPorudzbina) {
-            card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px;">`;
-            card += `<img src=${porudzbina.Proizvod.Slika}></img>`;
-            card += `<p>Naziv: ${porudzbina.Proizvod.Naziv}</p>`;
-            card += `<p>Kolicina: ${porudzbina.Kolicina}</p>`;
-            card += `<p>Cena: ${porudzbina.Proizvod.Cena}</p>`;
-            card += `<p>Status: ${porudzbina.StatusPorudzbine == 0 ? "Aktivan" : porudzbina.StatusPorudzbine == 1 ? "Izvrsen" : "Otkazan"} ${porudzbina.DatumPorudzbine.slice(0, 10)}</p>`;
+            card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:200px; border: 1px solid black;">`;
+            card += `<img src=${podaci.ListaPorudzbina[porudzbina].Proizvod.Slika} style="width:100%; height: 30%;object-fit: contain;"></img>`;
+            card += `<p style="font-size: 1.5rem;">Naziv: ${podaci.ListaPorudzbina[porudzbina].Proizvod.Naziv}</p>`;
+            card += `<p style="font-size: 1.5rem;">Kolicina: ${podaci.ListaPorudzbina[porudzbina].Kolicina}</p>`;
+            card += `<p style="font-size: 1.5rem;">Cena: ${podaci.ListaPorudzbina[porudzbina].Proizvod.Cena}</p>`;
+            card += `<p style="font-size: 1.5rem;">Status: ${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 0 ? "Aktivan" : podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 1 ? "Izvrsen" : "Otkazan"} ${podaci.ListaPorudzbina[porudzbina].DatumPorudzbine.slice(0, 10)}</p>`;
             card += "</div>";
             listacardovaporudzbina += card;
         }
         $("#porudzbine-kupac-container").html(listacardovaporudzbina);
         let listaProizvoda = [];
         try {
-            $.get('api/BazaProizvoda', function (data, status) {
-                if (data) {
+            await $.get('api/BazaProizvoda', function (data, status) {
+                
+                if (!data) {
                     return;
                 }
+                
                 for (let proizvod in data) {
-                    for (let prozivod2 in podaci.ListOmiljenihProizvoda) {
-                        if (proizvod == prozivod2) {
-                            listaProizvoda.push(proizvod);
+                    for (let i = 0; i < podaci.ListaOmiljenihProizvoda.length;i++) {
+                        if (data[proizvod].Naziv == podaci.ListaOmiljenihProizvoda[i].Naziv) {
+                            listaProizvoda.push(data[proizvod]);
                         }
                     }
                 }
                 
 
             });
+            let listacardovaproizvoda = "";
+            for (let proizvod = 0; proizvod < listaProizvoda.length; proizvod++) {
+
+                card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:200px; border: 1px solid black;">`;
+                card += `<img src=${listaProizvoda[proizvod].Slika} style="width:100%; height: 30%;object-fit: contain;"></img>`;
+                card += `<p style="font-size: 1.5rem;">Naziv: ${listaProizvoda[proizvod].Naziv}</p>`;
+                card += `<p style="font-size: 1.5rem;">Cena: ${listaProizvoda[proizvod].Cena}</p>`;
+                if (listaProizvoda[proizvod].Kolicina <= 0) {
+                    card += `<p style="color: red; font-size: 1.5rem;">Proizvod je nedostupan</p>`
+                } else {
+                    card += `<p style="color: green; font-size: 1.5rem;">Dostupan</p>`
+                }
+                card += "</div>";
+                
+                listacardovaproizvoda += card;
+            }
+            $("#proizovdi-kupac-container").html(listacardovaproizvoda);
+
         } catch (error) {
             console.log(error)
         }
-        let listacardovaproizvoda = "";
-        for (let proizvod in listaProizvoda) {
-            card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px;">`;
-            card += `<img src=${proizvod.Proizvod.Slika}></img>`;
-            card += `<p>Naziv: ${proizvod.Proizvod.Naziv}</p>`;
-            card += `<p>Cena: ${proizvod.Proizvod.Cena}</p>`;
-            if (proizvod.Kolicina <= 0) {
-                card += `<p style="color: red;">Proizvod je nedostupan</p>`
-            }
-            card += "</div>";
-            listacardovaproizvoda += card;
-        }
-        $("#proizovdi-kupac-container").html(listacardovaproizvoda);
-
-        
     });
     $("#kupac-form").on('submit', function (e) {
 
@@ -120,7 +124,7 @@
             Rodjendan: date,
             Uloga: role,
             ListaPorudzbina: data.ListaPorudzbina,
-            ListOmiljenihProizvoda: data.ListOmiljenihProizvoda
+            ListaOmiljenihProizvoda: data.ListaOmiljenihProizvoda
         };
         try {
             $.ajax({

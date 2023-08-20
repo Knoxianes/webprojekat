@@ -20,6 +20,17 @@ namespace WebProjekat.Controllers
         {
             return PronadjiProizvod(naziv);
         }
+        public IHttpActionResult Put(Proizvod k)
+        {
+            if (AzurirajProizvod(k))
+            {
+                return Ok("Uspesno azuriran korisnik");
+            }
+            return BadRequest("Korisnik ne postoji");
+        }
+
+      
+
         public IHttpActionResult Post(Proizvod k)
         {
             if (DodajProizvod(k))
@@ -38,12 +49,26 @@ namespace WebProjekat.Controllers
         }
 
 
-        private string dbPath = "";
+        private string dbPath = "C:\\Users\\strah\\OneDrive\\Dokumenti\\GitLab\\WebProjekat\\App_Data\\BazaProizvoda.json";
 
         private List<Proizvod> ProcitajBazu()
         {
             string procitanaBaza = File.ReadAllText(dbPath);
             return JsonConvert.DeserializeObject<List<Proizvod>>(procitanaBaza);
+        }
+        private bool AzurirajProizvod(Proizvod k)
+        {
+            var baza = ProcitajBazu();
+            for (int i = 0; i < baza.Count; i++)
+            {
+                if (baza[i].Naziv == k.Naziv)
+                {
+                    baza[i] = k;
+                    SacuvajBazu(baza);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void SacuvajBazu(List<Proizvod> baza)

@@ -20,9 +20,131 @@
                     <option value="opadajuce">Cena opadajuce</option>
                 </select>
         </div>
-        <div class="products-container" id="products-container">
+        <div class="products-container" id="products-container" style="display:flex; flex-direction:row; flex-wrap: wrap;width: 100%;gap: 10px; padding: 5px;">
 
         </div>
     </div>
 </div>
+<script>
+    $(window).on("load", function () {
+        try {
+            $.get('api/BazaProizvoda', function (data, status) {
+            
+                if (!data) {
+                    return;
+                }
+                lista = data;
+                let listacardova = "";
+                let loggedin = sessionStorage.getItem("logedIn");
+                let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
+                for (let proizvod = 0; proizvod < lista.length; proizvod++) {
+                    card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:25%; border: 1px solid black;">`;
+                    card += `<img src=${lista[proizvod].Slika} style="width:100%; height: 30%;object-fit: contain;"></img>`;
+                    card += `<p style="font-size: 1.5rem;">Naziv: ${lista[proizvod].Naziv}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Cena: ${lista[proizvod].Cena}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Kolicina: ${lista[proizvod].Kolicina}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Datum objavljivanja: ${lista[proizvod].Objavljen.slice(0,10)}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Grad: ${lista[proizvod].Grad}</p>`;
+                    if (lista[proizvod].Kolicina <= 0) {
+                        card += `<p style="color: red; font-size: 1.5rem;">Nedostupan</p>`
+                    } else {
+                        card += `<p style="color: green; font-size: 1.5rem;">Dostupan</p>`
+                    }
+                    if (loggedin == 0) {
+                        let omiljeni = false;
+                        for (tmp in logedInUser.ListaOmiljenihProizvoda) {
+                            if (logedInUser.ListaOmiljenihProizvoda[tmp].Naziv == lista[proizvod].Naziv) {
+                                omiljeni = true;
+                            }
+                        }
+                        if (omiljeni) {
+                            card += `<p style="font-size: 1.5rem;">Omiljeni proizvod: <input type="checkbox" id="${lista[proizvod].Naziv}-checked" checked></input></p>`
+                        } else {
+                            card += `<p style="font-size: 1.5rem;">Omiljeni proizvod: <input type="checkbox" id="${lista[proizvod].Naziv}-checked"></input></p>`
+                        }
+                        card += `<button name="kupi-dugme" id="${lista[proizvod].Naziv}-kupi" style="font-size: 1.5rem; padding: 3px;${lista[proizvod].Kolicina == 0 ? "display: none;": ""}" >Kupi</button>`;
+                    }
+                    card += "</div>";
+                    listacardova += card;
+                }
+                $("#products-container").html(listacardova);
+                $(`input[type="checkbox"]`).click(function (e) {
+                    let value = $(`#${e.target.id}:checked`).length;
+                    let proizvod_clicked = e.target.id.slice(0, -8);
+                    if (value == 1) {
+                        $.get(`api/BazaProizvoda?naziv=${proizvod_clicked}`, function (data, status) {
+                            let logedinuser = JSON.parse(sessionStorage.getItem("userData"));
+                            logedinuser.ListaOmiljenihProizvoda.push(data);
+                            $.ajax({
+                                type: "PUT",
+                                url: "/api/BazaKorisnika",
+                                data: JSON.stringify(logedinuser),
+                                contentType: "application/json"
+
+                            })
+                            sessionStorage.setItem("userData", JSON.stringify(logedinuser));
+                        })
+                    } else {
+                        let logedinuser = JSON.parse(sessionStorage.getItem("userData"));
+                        for (let i = 0; i < logedinuser.ListaOmiljenihProizvoda.length; i++) {
+                            if (logedinuser.ListaOmiljenihProizvoda[i].Naziv == proizvod_clicked) {
+                                logedinuser.ListaOmiljenihProizvoda.splice(i, 1);
+                                break;
+                            }
+                        }
+                        $.ajax({
+                            type: "PUT",
+                            url: "/api/BazaKorisnika",
+                            data: JSON.stringify(logedinuser),
+                            contentType: "application/json"
+
+                        })
+                        sessionStorage.setItem("userData", JSON.stringify(logedinuser));
+                        
+                    }
+                    
+                })
+                $(`button[name="kupi-dugme"]`).click( function (e) {
+                    let proizvod_clicked = e.target.id.slice(0, -5);
+                    $.get(`api/BazaProizvoda?naziv=${proizvod_clicked}`, async function (data, status) {
+                        let logedinuser = JSON.parse(sessionStorage.getItem("userData"))
+                        data.Kolicina = data.Kolicina - 1;
+                        console.log(data.Kolicina);
+                        let porudzbina = {
+                            Proizvod: data,
+                            Kolicina: 1,
+                            Kupac: logedinuser.Korisnicko_ime,
+                            DatumPorudzbine: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`,
+                            StatusPorudzbine: 0
+                        };
+                        console.log(porudzbina.DatumPorudzbine);
+                        logedinuser.ListaPorudzbina.push(porudzbina);
+                        $.ajax({
+                            type: "PUT",
+                            url: "/api/BazaKorisnika",
+                            data: JSON.stringify(logedinuser),
+                            contentType: "application/json"
+
+                        })
+                        sessionStorage.setItem("userData", JSON.stringify(logedinuser));
+                        $.ajax({
+                            type: "PUT",
+                            url: "/api/BazaProizvoda",
+                            data: JSON.stringify(data),
+                            contentType: "application/json"
+
+                        })
+                        location.href = "Kupac";
+                    })
+
+                })
+
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    })
+   
+       
+</script>
 
