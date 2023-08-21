@@ -3,23 +3,25 @@
         <div class="filter-header">
             <label>FILTERI</label>
         </div>
-        <div class="filter-container">
-            <label>Pretraga: <input type="search" /></label>
-            <label>Min: <input type="number" /></label>
-            <label>Max: <input type="number" /></label>
-            <select id="grad-filter">
-
+        <form class="filter-container">
+            <label>Pretraga: <input type="search" name="pretraga" /></label>
+            <label>Min: <input type="number" name="min" min="0" /></label>
+            <label>Max: <input type="number" name="max" min="0" /></label>
+            <select  style="font-size: 1.5rem;" id="grad-filter" name="grad">
             </select>
-        </div>
+            <select style="font-size: 1.5rem;" name="sortiranje">
+                <option style="font-size: 1.5rem;" value="relevantno">Relevantno</option>
+                <option style="font-size: 1.5rem;" value="cena-rastuce">Cena rastuce</option>
+                <option style="font-size: 1.5rem;" value="cena-opadajuce">Cena opadajuce</option>
+                <option style="font-size: 1.5rem;" value="datum-rastuce">Datum rastuce</option>
+                <option style="font-size: 1.5rem;" value="datum-opadajuce">Datum opadajuce</option>
+                <option style="font-size: 1.5rem;" value="naziv-rastuce">Naziv rastuce</option>
+                <option style="font-size: 1.5rem;" value="naziv-opadajuce">Naziv opadajuce</option>
+            </select>
+            <input type="submit" value="Upotrebite filtere" />
+        </form>
     </div>
     <div class="products">
-        <div class="products-header">
-                <select>
-                    <option value="relevantno">Relevantno</option>
-                    <option value="rastuce">Cena rastuce</option>
-                    <option value="opadajuce">Cena opadajuce</option>
-                </select>
-        </div>
         <div class="products-container" id="products-container" style="display:flex; flex-direction:row; flex-wrap: wrap;width: 100%;gap: 10px; padding: 5px;">
 
         </div>
@@ -34,11 +36,75 @@
                     return;
                 }
                 lista = data;
+                let lista_gradova = `<option value="nista" style="font-size: 1.5rem;">Nista</option>`;
+                for (let j in lista) {
+                    if (lista[j].Kolicina > 0) {
+                        lista_gradova += `<option value=${lista[j].Grad} style="font-size:1.5rem;">${lista[j].Grad}</option>`
+                    }
+                }
+                $("#grad-filter").html(lista_gradova);
+                let filterUrl = location.search;
+                if (filterUrl) {
+                    const filterParams = new URLSearchParams(filterUrl);
+                    const pretraga = filterParams.get("pretraga");
+                    const min = filterParams.get("min");
+                    const max = filterParams.get("max");
+                    const grad = filterParams.get("grad");
+                    const sortiranje = filterParams.get("sortiranje");
+                    for (let i = 0; i < lista.length; i++) {
+                        let changed = "nochange";
+                        if (pretraga && !lista[i].Naziv.includes(pretraga)) {
+                            changed = "change";
+                            lista.splice(i, 1);
+                        }
+                        if (min && list[i].Cena < parseInt(min)) {
+                            changed = "change";
+                            changed = "change";
+                            lista.splice(i, 1);
+                        }
+                        if (max && lista[i].Cena > parseInt(max)) {
+                            changed = "change";
+                            lista.splice(i, 1);
+                        }
+                        if (grad != "nista" && lista[i].Grad != grad) {
+                            changed = "change";
+                            lista.splice(i, 1);
+                        }
+                        if (changed != "nochange") {
+                            i--;
+                        }
+                    }
+                    if (sortiranje != "relevantno") {
+                        console.log(sortiranje);
+                        switch (sortiranje) {
+                            case "cena-rastuce":
+                                console.log(sortiranje);
+                                lista.sort((a, b) => (a.Cena > b.Cena) ? 1 : -1);
+                                break;
+                            case "cena-opadajuce":
+                                lista.sort((a, b) => a.Cena < b.Cena ? 1 : -1);
+                                break;
+                            case "datum-rastuce":
+                                lista.sort((a, b) => new Date(a.Objavljen) > new Date(b.Objavljen) ? 1 : -1);
+                                break;
+                            case "datum-opadajuce":
+                                lista.sort((a, b) => new Date(a.Objavljen) < new Date(b.Objavljen) ? 1 : -1);
+                                break;
+                            case "naziv-rastuce":
+                                lista.sort((a, b) => a.Naziv > b.Naziv ? 1 : -1);
+                                break;
+                            case "naziv-opadajuce":
+                                lista.sort((a, b) => a.Naziv < b.Naziv ? 1 : -1);
+                                break;
+                        }
+                    }
+                }
                 let listacardova = "";
+
                 let loggedin = sessionStorage.getItem("logedIn");
                 let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
                 for (let proizvod = 0; proizvod < lista.length; proizvod++) {
-                    card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:25%; border: 1px solid black;">`;
+                    card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:25%; border: 1px solid black; ${lista[proizvod].Kolicina == 0 ? "display: none;" : ""}">`;
                     card += `<img src=${lista[proizvod].Slika} style="width:100%; height: 30%;object-fit: contain;"></img>`;
                     card += `<p style="font-size: 1.5rem;">Naziv: ${lista[proizvod].Naziv}</p>`;
                     card += `<p style="font-size: 1.5rem;">Cena: ${lista[proizvod].Cena}</p>`;
@@ -49,6 +115,7 @@
                         card += `<p style="color: red; font-size: 1.5rem;">Nedostupan</p>`
                     } else {
                         card += `<p style="color: green; font-size: 1.5rem;">Dostupan</p>`
+                        
                     }
                     if (loggedin == 0) {
                         let omiljeni = false;
@@ -62,12 +129,15 @@
                         } else {
                             card += `<p style="font-size: 1.5rem;">Omiljeni proizvod: <input type="checkbox" id="${lista[proizvod].Naziv}-checked"></input></p>`
                         }
-                        card += `<button name="kupi-dugme" id="${lista[proizvod].Naziv}-kupi" style="font-size: 1.5rem; padding: 3px;${lista[proizvod].Kolicina == 0 ? "display: none;": ""}" >Kupi</button>`;
+                        card += `<button name="kupi-dugme" id="${lista[proizvod].Naziv}-kupi" style="font-size: 1.5rem; padding: 3px;" >Kupi</button>`;
                     }
                     card += "</div>";
                     listacardova += card;
+                   
+                    
                 }
                 $("#products-container").html(listacardova);
+
                 $(`input[type="checkbox"]`).click(function (e) {
                     let value = $(`#${e.target.id}:checked`).length;
                     let proizvod_clicked = e.target.id.slice(0, -8);

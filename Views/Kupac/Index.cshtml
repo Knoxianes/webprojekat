@@ -58,7 +58,8 @@
             card += `<p style="font-size: 1.5rem;">Naziv: ${podaci.ListaPorudzbina[porudzbina].Proizvod.Naziv}</p>`;
             card += `<p style="font-size: 1.5rem;">Kolicina: ${podaci.ListaPorudzbina[porudzbina].Kolicina}</p>`;
             card += `<p style="font-size: 1.5rem;">Cena: ${podaci.ListaPorudzbina[porudzbina].Proizvod.Cena}</p>`;
-            card += `<p style="font-size: 1.5rem;">Status: ${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 0 ? "Aktivan" : podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 1 ? "Izvrsen" : "Otkazan"} ${podaci.ListaPorudzbina[porudzbina].DatumPorudzbine.slice(0, 10)}</p>`;
+            card += `<p style="font-size: 1.5rem;">Status: ${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 0 ? "Aktivan" : podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 1 ? "Izvrsena" : "Otkazana"} ${podaci.ListaPorudzbina[porudzbina].DatumPorudzbine.slice(0, 10)}</p>`;
+            card += `<button name="izvrsen-button" id="${porudzbina}" style="font-size: 1.5rem; padding: 10px; background-color: green;${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine != 0 ? "display: none" : ""}">Izvrsena?</button>`
             card += "</div>";
             listacardovaporudzbina += card;
         }
@@ -102,6 +103,25 @@
         } catch (error) {
             console.log(error)
         }
+        $(`button[name="izvrsen-button"]`).click(async function (e) {
+            let index = e.target.id;
+            podaci.ListaPorudzbina[index].StatusPorudzbine = 1;
+            try {
+                await $.ajax({
+                    type: "PUT",
+                    url: "/api/BazaKorisnika",
+                    data: JSON.stringify(podaci),
+                    contentType: "application/json"
+
+                })
+                window.sessionStorage.setItem("userData", JSON.stringify(podaci));
+                location.reload();
+            } catch (error) {
+                console.log(error);
+            }
+        })
+             
+        
     });
     $("#kupac-form").on('submit', function (e) {
 
