@@ -21,7 +21,7 @@ namespace WebProjekat.Models
         private string _grad;
         private StatusProizvoda _statusProizvoda;
 
-        private List<Recenzija> _listaRecenzije;
+        private List<Recenzija> _listaRecenzija;
 
         public Proizvod(string naziv, double cena, uint kolicina, string opis, string slika, DateTime objavljen, string grad, StatusProizvoda status)
         {
@@ -33,7 +33,7 @@ namespace WebProjekat.Models
             _objavljen = objavljen;
             _grad = grad;
             _statusProizvoda = status;
-            ListaRecenzije = new List<Recenzija>();
+            ListaRecenzija = new List<Recenzija>();
         }
 
         public string Naziv { get => _naziv; set => _naziv = value; }
@@ -43,7 +43,7 @@ namespace WebProjekat.Models
         public string Slika { get => _slika; set => _slika = value; }
         public DateTime Objavljen { get => _objavljen; set => _objavljen = value; }
         public string Grad { get => _grad; set => _grad = value; }
-        public StatusProizvoda StatusProzivoda { get => _statusProizvoda; set => _statusProizvoda = value; }
-        public List<Recenzija> ListaRecenzije { get => _listaRecenzije; set => _listaRecenzije = value; }
+        public StatusProizvoda StatusProizvoda { get => _statusProizvoda; set => _statusProizvoda = value; }
+        public List<Recenzija> ListaRecenzija { get => _listaRecenzija; set => _listaRecenzija = value; }
     }
 }

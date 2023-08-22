@@ -13,5 +13,9 @@ namespace WebProjekat.Controllers
         {
             return View();
         }
+        public ActionResult Proizvod(string naziv)
+        {
+            return View();
+        }
     }
 }

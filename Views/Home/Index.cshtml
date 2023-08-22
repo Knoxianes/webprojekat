@@ -30,7 +30,7 @@
 <script>
     $(window).on("load", function () {
         try {
-            $.get('api/BazaProizvoda', function (data, status) {
+            $.get('/api/BazaProizvoda', function (data, status) {
             
                 if (!data) {
                     return;
@@ -104,19 +104,22 @@
                 let loggedin = sessionStorage.getItem("logedIn");
                 let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
                 for (let proizvod = 0; proizvod < lista.length; proizvod++) {
-                    card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:25%; border: 1px solid black; ${lista[proizvod].Kolicina == 0 ? "display: none;" : ""}">`;
+                    card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:300px; border: 1px solid black; padding: 5px;${lista[proizvod].Kolicina == 0 ? "display: none;" : ""}">`;
+                    card += `<a href="/Home/Proizvod/${lista[proizvod].Naziv}"  style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 6px; text-decoration: none; color: black;margin-bottom: -30px;">`;
                     card += `<img src=${lista[proizvod].Slika} style="width:100%; height: 30%;object-fit: contain;"></img>`;
                     card += `<p style="font-size: 1.5rem;">Naziv: ${lista[proizvod].Naziv}</p>`;
                     card += `<p style="font-size: 1.5rem;">Cena: ${lista[proizvod].Cena}</p>`;
                     card += `<p style="font-size: 1.5rem;">Kolicina: ${lista[proizvod].Kolicina}</p>`;
                     card += `<p style="font-size: 1.5rem;">Datum objavljivanja: ${lista[proizvod].Objavljen.slice(0,10)}</p>`;
                     card += `<p style="font-size: 1.5rem;">Grad: ${lista[proizvod].Grad}</p>`;
+                   
                     if (lista[proizvod].Kolicina <= 0) {
                         card += `<p style="color: red; font-size: 1.5rem;">Nedostupan</p>`
                     } else {
                         card += `<p style="color: green; font-size: 1.5rem;">Dostupan</p>`
                         
                     }
+                    card += `</a>`;
                     if (loggedin == 0) {
                         let omiljeni = false;
                         for (tmp in logedInUser.ListaOmiljenihProizvoda) {
@@ -142,7 +145,7 @@
                     let value = $(`#${e.target.id}:checked`).length;
                     let proizvod_clicked = e.target.id.slice(0, -8);
                     if (value == 1) {
-                        $.get(`api/BazaProizvoda?naziv=${proizvod_clicked}`, function (data, status) {
+                        $.get(`/api/BazaProizvoda?naziv=${proizvod_clicked}`, function (data, status) {
                             let logedinuser = JSON.parse(sessionStorage.getItem("userData"));
                             logedinuser.ListaOmiljenihProizvoda.push(data);
                             $.ajax({
@@ -176,10 +179,9 @@
                 })
                 $(`button[name="kupi-dugme"]`).click( function (e) {
                     let proizvod_clicked = e.target.id.slice(0, -5);
-                    $.get(`api/BazaProizvoda?naziv=${proizvod_clicked}`, async function (data, status) {
+                    $.get(`/api/BazaProizvoda?naziv=${proizvod_clicked}`, async function (data, status) {
                         let logedinuser = JSON.parse(sessionStorage.getItem("userData"))
                         data.Kolicina = data.Kolicina - 1;
-                        console.log(data.Kolicina);
                         let porudzbina = {
                             Proizvod: data,
                             Kolicina: 1,
@@ -187,7 +189,6 @@
                             DatumPorudzbine: `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`,
                             StatusPorudzbine: 0
                         };
-                        console.log(porudzbina.DatumPorudzbine);
                         logedinuser.ListaPorudzbina.push(porudzbina);
                         $.ajax({
                             type: "PUT",
@@ -204,7 +205,7 @@
                             contentType: "application/json"
 
                         })
-                        location.href = "Kupac";
+                        location.href = "/Kupac";
                     })
 
                 })

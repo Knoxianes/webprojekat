@@ -145,6 +145,7 @@
     <Content Include="Views\Kupac\Index.cshtml" />
     <Content Include="Views\Prodavac\Index.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Home\Proizvod.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

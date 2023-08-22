@@ -1,0 +1,89 @@
+﻿<div style="display: flex; flex-direction: column; width:100%; gap: 20px; padding: 20px;">
+    <div id="proizvod-container" style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; width: 100%; gap: 10px;">
+
+    </div>
+    <div id="opis-container">
+
+    </div>
+    <div id="form-container" style="display: flex; flex-direction: column;justify-content:center; align-items:center; gap:10px;border:1px solid black; width:95%; padding:15px;">
+
+    </div>
+    <div id="recenzije-container" style="display: flex; width:100%; gap:15px; flex-direction: column;">
+
+    </div>
+</div>
+<script>
+    $(window).on("load", function () {
+        const nazivproizvoda = location.pathname.split("/")[3];
+        if (!nazivproizvoda) {
+            location.href = "/";
+        }
+        try {
+            $.get(`/api/BazaProizvoda?naziv=${nazivproizvoda}`, function (data, status) {
+                if (!data) {
+                    location.href = "/";
+                }
+
+                let proizvod_osnove = "";
+                proizvod_osnove += `<img src=${data.Slika} style="width:100%; height: 200px;object-fit: contain;"></img>`;
+                proizvod_osnove += `<p style="font-size: 2rem;">Naziv: ${data.Naziv}</p>`;
+                proizvod_osnove += `<p style="font-size: 2rem;">Cena: ${data.Cena}</p>`;
+                proizvod_osnove += `<p style="font-size: 2rem;">Kolicina: ${data.Kolicina}</p>`;
+                proizvod_osnove += `<p style="font-size: 2rem;">Datum objavljivanja: ${data.Objavljen.slice(0, 10)}</p>`;
+                proizvod_osnove += `<p style="font-size: 2rem;">Grad: ${data.Grad}</p>`;
+                if (data.Kolicina <= 0) {
+                    proizvod_osnove += `<p style="color: red; font-size: 2rem;">Nedostupan</p>`
+                } else {
+                    proizvod_osnove += `<p style="color: green; font-size: 2rem;">Dostupan</p>`
+
+                }
+                $("#proizvod-container").html(proizvod_osnove);
+                let opis = `<label style="font-size: 2rem; color: orange; display:inline;">Opis: <p  style="font-size: 2rem; display:inline; color: black">${data.Opis}</p></label>`;
+                $("#opis-container").html(opis);
+                let loggedin = sessionStorage.getItem("logedIn");
+                let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
+                if (loggedin == 0) {
+                    let mozeDatiRecenziju = false;
+                    for (let porudzbina in logedInUser.ListaPorudzbina) {
+                        if (logedInUser.ListaPorudzbina[porudzbina].Proizvod.Naziv == data.Naziv && logedInUser.ListaPorudzbina[porudzbina].StatusPorudzbine == 1) {
+                            mozeDatiRecenziju = true;
+                        }
+                    }
+                    for (let j in data.ListaRecenzija) {
+                        if (data.ListaRecenzija[j].Recenzent == logedInUser.Korisnicko_ime) {
+                            mozeDatiRecenziju == false;
+                        }
+                    }
+                    if (mozeDatiRecenziju) {
+                   
+                        let formelemet = `<label style="font-size:1.5rem;width: 95%;"> Naslov: <input type="text" id="naslov-input" style="width:90%; font-size:1.5rem;padding: 10px"/></label>`
+                        formelemet += `<label style="font-size:1.5rem;width: 95%;"> Recenzija: <textarea  id="textarea-input" rows=5    style="width:90%;font-size: 1.rem; padding:10px;resize:none"></textarea></label>`;
+                        formelemet += `<button id="objavi-button" style="font-size:1.5rem; padding:5px; width:50%;">Objavi</button>`;
+                        $("#form-container").html(formelemet);
+                    }
+                }
+                let recenzije = "";
+                for (let i in data.ListaRecenzija) {
+                    let recenzija = `<div style="display:flex; flex-direction: column; width: 95%; padding:10px; border: 1px solid black; gap: 3px">`;
+                    recenzija += `<div style="display:flex;gap:50px;width: 100%;">`;
+                    recenzija += `<label style="font-size: 2rem;" >Naslov: ${data.ListaRecenzija[i].Naslov}</label>`
+                    recenzija += `<label style="font-size: 2rem;">Recenzent: ${data.ListaRecenzija[i].Recenzent}</label>`
+                    recenzija += `</div>`;
+                    recenzija += "<hr/>";
+                    recenzija += `<div style="width: 100%;">`;
+                    recenzija += `<p style="font-size: 2rem;" >Sadrzaj recenzije: ${data.ListaRecenzija[i].Sadrzaj}</p>`
+                    recenzija += `</div>`;
+                    recenzija += "</div>";
+                    recenzije += recenzija;
+
+                }
+                $("#recenzije-container").html(recenzije);
+
+
+
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    })
+</script>

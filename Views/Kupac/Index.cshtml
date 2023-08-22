@@ -53,12 +53,14 @@
         document.getElementById("kupac-role").value = podaci.Uloga == 0 ? "KUPAC" : "PRODAVAC";
         let listacardovaporudzbina = "";
         for (let porudzbina in podaci.ListaPorudzbina) {
-            card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:200px; border: 1px solid black;">`;
+            card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:200px; border: 1px solid black;padding: 5px;">`;
+            card += `<a href="/Home/Proizvod/${podaci.ListaPorudzbina[porudzbina].Proizvod.Naziv}"  style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; text-decoration: none; color: black;">`;
             card += `<img src=${podaci.ListaPorudzbina[porudzbina].Proizvod.Slika} style="width:100%; height: 30%;object-fit: contain;"></img>`;
             card += `<p style="font-size: 1.5rem;">Naziv: ${podaci.ListaPorudzbina[porudzbina].Proizvod.Naziv}</p>`;
             card += `<p style="font-size: 1.5rem;">Kolicina: ${podaci.ListaPorudzbina[porudzbina].Kolicina}</p>`;
             card += `<p style="font-size: 1.5rem;">Cena: ${podaci.ListaPorudzbina[porudzbina].Proizvod.Cena}</p>`;
             card += `<p style="font-size: 1.5rem;">Status: ${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 0 ? "Aktivan" : podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 1 ? "Izvrsena" : "Otkazana"} ${podaci.ListaPorudzbina[porudzbina].DatumPorudzbine.slice(0, 10)}</p>`;
+            card += "</a>";
             card += `<button name="izvrsen-button" id="${porudzbina}" style="font-size: 1.5rem; padding: 10px; background-color: green;${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine != 0 ? "display: none" : ""}">Izvrsena?</button>`
             card += "</div>";
             listacardovaporudzbina += card;
@@ -85,7 +87,8 @@
             let listacardovaproizvoda = "";
             for (let proizvod = 0; proizvod < listaProizvoda.length; proizvod++) {
 
-                card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:200px; border: 1px solid black;">`;
+                card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:200px; border: 1px solid black;padding: 5px">`;
+                card += `<a href="/Home/Proizvod/${listaProizvoda[proizvod].Naziv}"  style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; text-decoration: none; color: black;">`;
                 card += `<img src=${listaProizvoda[proizvod].Slika} style="width:100%; height: 30%;object-fit: contain;"></img>`;
                 card += `<p style="font-size: 1.5rem;">Naziv: ${listaProizvoda[proizvod].Naziv}</p>`;
                 card += `<p style="font-size: 1.5rem;">Cena: ${listaProizvoda[proizvod].Cena}</p>`;
@@ -94,6 +97,7 @@
                 } else {
                     card += `<p style="color: green; font-size: 1.5rem;">Dostupan</p>`
                 }
+                card += "</a>";
                 card += "</div>";
                 
                 listacardovaproizvoda += card;

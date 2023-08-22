@@ -11,7 +11,7 @@
     <script src="~/Scripts/jquery/jquery.js">
     </script>
     <div class="navbar">
-        <div class="logo-div"><div id="logo">Logo/Home</div></div>
+        <div class="logo-div"><a id="logo" href="/">Logo/Home</a></div>
         <div id="profile"></div>
     </div>
     <hr class="navbar-divider" />
@@ -33,22 +33,19 @@
         $("#profile").on("click", function () {
             if (logedIn == 0)
             {
-                document.location.href = "Kupac";
+                window.location.href = "/Kupac";
             }
             else if (logedIn == 1)
             {
-                document.location.href = "Prodavac";
+                window.location.href = "/Prodavac";
             }
             else if (logedIn == 2) {
-                document.location.href = "Admin";
+                window.location.href = "/Admin";
             }
             else
             {
-                document.location.href = "LogIn";
+                document.location.href = "/LogIn";
             }
-        });
-        $("#logo").on("click", function () {
-            document.location.href = "Home";
         });
     </script>
 </body>
