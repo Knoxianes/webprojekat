@@ -15,6 +15,7 @@
         <label style="font-size: 2rem; padding: 2px;  ">Email: <input type="email" id="prodavac-email" style="font-size: 1.5rem; padding: 2px" required /></label>
         <label style="font-size: 2rem; padding: 2px;  ">Kada ste rodjeni: <input type="date" id="prodavac-date" style="font-size: 1.5rem; padding: 2px" required /></label>
         <button type="submit" id="save_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">Save</button>
+        <button id="logout_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">Logout</button>
     </div>
     <div style="display:flex; flex-direction: column; justify-content:center; align-items: center; padding: 3px; gap: 20px;">
         <div style="display: flex; flex-direction: column; width: 700px; justify-content: center; gap: 5px; align-items: center;">
@@ -212,11 +213,11 @@
         location.href ="/Prodavac/Dodaj"
     });
     $("#logout_button").click(function () {
-        sessionStorage.setItem("userData", "");
+        sessionStorage.setItem("userData", null);
         sessionStorage.setItem("logedIn", -1);
         sessionStorage.setItem("logIn", false);
         $("#profile").empty();
-        location.href = "/";
+        location.href = "/LogIn";
     })
    
 </script>

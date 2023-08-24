@@ -58,7 +58,7 @@
 
         })
         let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
-        logedInUser.ListaOmiljenihProizvoda.push({ ...Proizvod, ListaRecenzija: [], StatusProizvoda: Proizvod.Kolicina <= 0 ? 1 : 0, Objavljen: new Date() });
+        logedInUser.ListaObjavljenihProizvoda.push({ ...Proizvod, ListaRecenzija: [], StatusProizvoda: Proizvod.Kolicina <= 0 ? 1 : 0, Objavljen: new Date() });
         await $.ajax({
             type: "PUT",
             url: "/api/BazaKorisnika",

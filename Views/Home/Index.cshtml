@@ -100,9 +100,9 @@
                 let loggedin = sessionStorage.getItem("logedIn");
                 let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
                 for (let proizvod = 0; proizvod < lista.length; proizvod++) {
-                    card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:300px; border: 1px solid black; padding: 5px;${lista[proizvod].Kolicina == 0 ? "display: none;" : ""}">`;
-                    card += `<a href="/Home/Proizvod/${lista[proizvod].Naziv}"  style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 6px; text-decoration: none; color: black;margin-bottom: -30px;">`;
-                    card += `<img src=${lista[proizvod].Slika} style="width:100%; height: 30%;object-fit: contain;"></img>`;
+                    card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 10px; width:300px; border: 1px solid black; padding: 15px;${lista[proizvod].Kolicina == 0 ? "display: none;" : ""}">`;
+                    card += `<a href="/Home/Proizvod/${lista[proizvod].Naziv}"  style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 6px; text-decoration: none; color: black;">`;
+                    card += `<img src=${lista[proizvod].Slika} style="width:200px; height: 200px;object-fit: contain;"></img>`;
                     card += `<p style="font-size: 1.5rem;">Naziv: ${lista[proizvod].Naziv}</p>`;
                     card += `<p style="font-size: 1.5rem;">Cena: ${lista[proizvod].Cena}</p>`;
                     card += `<p style="font-size: 1.5rem;">Kolicina: ${lista[proizvod].Kolicina}</p>`;
