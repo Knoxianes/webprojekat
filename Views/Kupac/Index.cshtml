@@ -1,5 +1,5 @@
 ﻿<div style="height: 100%; display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 0.5rem; font-size: 2rem;">
-    <form id="kupac-form" style="display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-start; gap:0.5rem; margin-left: 20px;">
+    <div id="kupac-form" style="display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-start; gap:0.5rem; margin-left: 20px;">
         <h1 style="font-size: 3rem; padding: 2px;">Profil</h1>
         <label style="font-size: 2rem; padding: 2px;  ">Korisnicko ime: <input type="text" id="kupac-username" style="font-size: 1.5rem; padding: 2px" disabled /></label>
         <label style="font-size: 2rem; padding: 2px;  ">Sifra: <input type="password" id="kupac-password" style="font-size: 1.5rem; padding: 2px" required /></label>
@@ -14,15 +14,9 @@
         </label>
         <label style="font-size: 2rem; padding: 2px;  ">Email: <input type="email" id="kupac-email" style="font-size: 1.5rem; padding: 2px" required /></label>
         <label style="font-size: 2rem; padding: 2px;  ">Kada ste rodjeni: <input type="date" id="kupac-date" style="font-size: 1.5rem; padding: 2px" required /></label>
-        <label style="font-size: 2rem; padding: 2px;  ">
-            Uloga:
-            <select style="font-size: 1.5rem; padding: 2px" id="kupac-role" required>
-                <option value="KUPAC">Kupac</option>
-                <option value="PRODAVAC">Prodavac</option>
-            </select>
-        </label>
         <button type="submit" id="save_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">Save</button>
-    </form>
+        <button type="submit" id="logout_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">Logout</button>
+    </div>
     <div style="display:flex; flex-direction: column; justify-content:center; align-items: center; padding: 3px; gap: 20px;">
         <div style="display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 5px; align-items: center;">
             <h2 style="font-size: 2rem">Porudzbine</h2>
@@ -40,8 +34,8 @@
     
     $(window).on("load", async function () {
         let podaci = JSON.parse(window.sessionStorage.getItem("userData"));
-        if (!podaci) {
-            document.location.href = "Home";
+        if (!podaci || podaci.Uloga != 0) {
+            document.location.href = "/Home";
         }
         document.getElementById("kupac-username").value = podaci.Korisnicko_ime;
         document.getElementById("kupac-password").value = podaci.Lozinka;
@@ -50,7 +44,6 @@
         document.getElementById("kupac-gender").value = podaci.Pol == 0 ? "MUSKI" : "ZENSKI";
         document.getElementById("kupac-email").value = podaci.Email;
         document.getElementById("kupac-date").value = podaci.Rodjendan.slice(0, 10);
-        document.getElementById("kupac-role").value = podaci.Uloga == 0 ? "KUPAC" : "PRODAVAC";
         let listacardovaporudzbina = "";
         for (let porudzbina in podaci.ListaPorudzbina) {
             card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:200px; border: 1px solid black;padding: 5px;">`;
@@ -127,7 +120,7 @@
              
         
     });
-    $("#kupac-form").on('submit', function (e) {
+    $("#save_button").on('click', async function (e) {
 
         let data = JSON.parse(window.sessionStorage.getItem("userData"));
         const username = document.getElementById("kupac-username").value;
@@ -137,7 +130,7 @@
         const gender = document.getElementById("kupac-gender").value;;
         const email = document.getElementById("kupac-email").value;
         const date = document.getElementById("kupac-date").value;
-        const role = document.getElementById("kupac-role").value;
+        const role = data.Uloga;
         const Korisnik = {
             Korisnicko_ime: username,
             Lozinka: password,
@@ -151,7 +144,7 @@
             ListaOmiljenihProizvoda: data.ListaOmiljenihProizvoda
         };
         try {
-            $.ajax({
+            await $.ajax({
                 type: "PUT",
                 url: "/api/BazaKorisnika",
                 data: JSON.stringify(Korisnik),
@@ -159,11 +152,19 @@
 
             })
             window.sessionStorage.setItem("userData", JSON.stringify(Korisnik));
+            location.reload();
         } catch (error) {
             console.log(error);
         }
 
     });
+    $("#logout_button").click(function () {
+        sessionStorage.setItem("userData", "");
+        sessionStorage.setItem("logedIn", -1);
+        sessionStorage.setItem("logIn",false);
+        $("#profile").empty();
+        location.href = "/";
+    })
 
 </script>
 

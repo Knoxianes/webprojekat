@@ -23,16 +23,23 @@ namespace WebProjekat.Models
 
         private List<Recenzija> _listaRecenzija;
 
-        public Proizvod(string naziv, double cena, uint kolicina, string opis, string slika, DateTime objavljen, string grad, StatusProizvoda status)
+        public Proizvod(string naziv, double cena, uint kolicina, string opis, string slika, string grad)
         {
             _naziv = naziv;
             _cena = cena;
             _kolicina = kolicina;
             _opis = opis;
             _slika = slika;
-            _objavljen = objavljen;
             _grad = grad;
-            _statusProizvoda = status;
+            Objavljen = DateTime.Now;
+            if(kolicina <= 0)
+            {
+                StatusProizvoda = StatusProizvoda.NEDOSTUPAN;
+            }
+            else
+            {
+                StatusProizvoda = StatusProizvoda.DOSTPAN;
+            }
             ListaRecenzija = new List<Recenzija>();
         }
 

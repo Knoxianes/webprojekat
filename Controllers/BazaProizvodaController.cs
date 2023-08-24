@@ -39,9 +39,9 @@ namespace WebProjekat.Controllers
             }
             return BadRequest("Proizvod vec postoji");
         }
-        public IHttpActionResult Delete(string korisnicko_ime)
+        public IHttpActionResult Delete(string naziv)
         {
-            if (ObrisiProizvod(korisnicko_ime))
+            if (ObrisiProizvod(naziv))
             {
                 return Ok("Uspesno obrisan Proizvod");
             }

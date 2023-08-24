@@ -1,2 +1,223 @@
-﻿
+﻿<div style="height: 100%; display: flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 0.5rem; font-size: 2rem;">
+    <div id="prodavac-form" style="display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-start; gap:0.5rem; margin-left: 20px;">
+        <h1 style="font-size: 3rem; padding: 2px;">Profil</h1>
+        <label style="font-size: 2rem; padding: 2px;  ">Korisnicko ime: <input type="text" id="prodavac-username" style="font-size: 1.5rem; padding: 2px" disabled /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Sifra: <input type="password" id="prodavac-password" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Ime: <input type="text" id="prodavac-name" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Prezime: <input type="text" id="prodavac-lastname" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">
+            Pol:
+            <select style="font-size: 1.5rem; padding: 2px" id="prodavac-gender" required>
+                <option value="MUSKI">Muski</option>
+                <option value="ZENSKI">Zenski</option>
+            </select>
+        </label>
+        <label style="font-size: 2rem; padding: 2px;  ">Email: <input type="email" id="prodavac-email" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Kada ste rodjeni: <input type="date" id="prodavac-date" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <button type="submit" id="save_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">Save</button>
+    </div>
+    <div style="display:flex; flex-direction: column; justify-content:center; align-items: center; padding: 3px; gap: 20px;">
+        <div style="display: flex; flex-direction: column; width: 700px; justify-content: center; gap: 5px; align-items: center;">
+            <h2 style="font-size: 2rem">Filteri</h2>
+            <form id="filteri-prodavac-form" style="display: flex; flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: space-evenly; gap: 5px; align-items: center;">
+                <select   style="font-size: 1.5rem;"  id="status-select" name="status">
+                    <option  style="font-size: 1.5rem;"  value="nista">Nista</option>
+                    <option  style="font-size: 1.5rem;"  value="dostupan">Dostupan</option>
+                    <option  style="font-size: 1.5rem;"  value="nedostupan">Nedostupan</option>
+                </select>
+                <select style="font-size: 1.5rem;" id="sortiranje-select" name="sortiranje">
+                    <option style="font-size: 1.5rem;" value="relevantno">Relevantno</option>
+                    <option style="font-size: 1.5rem;" value="cena-rastuce">Cena rastuce</option>
+                    <option style="font-size: 1.5rem;" value="cena-opadajuce">Cena opadajuce</option>
+                    <option style="font-size: 1.5rem;" value="datum-rastuce">Datum rastuce</option>
+                    <option style="font-size: 1.5rem;" value="datum-opadajuce">Datum opadajuce</option>
+                    <option style="font-size: 1.5rem;" value="naziv-rastuce">Naziv rastuce</option>
+                    <option style="font-size: 1.5rem;" value="naziv-opadajuce">Naziv opadajuce</option>
+                </select>
+                <input type="submit" value="Upotrebite filtere" style="font-size: 1.5rem; padding: 5px;" />
+                
+            </form>
+        </div>
+        <div style="display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 5px; align-items: center;">
+            <h2 style="font-size: 2rem">Omiljeni proizvodi</h2>
+            <button id="dodaj-button" style="font-size:1.5rem;padding:5px;width:200px;">Dodaj proizvod</button>
+            <div id="proizovdi-prodavac-container" style="display: flex; flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: space-evenly; gap: 5px; align-items: center;">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(window).on("load", function () {
+        let podaci = JSON.parse(window.sessionStorage.getItem("userData"));
+        if (!podaci || podaci.Uloga != 1) {
+            document.location.href = "Home";
+        }
+        document.getElementById("prodavac-username").value = podaci.Korisnicko_ime;
+        document.getElementById("prodavac-password").value = podaci.Lozinka;
+        document.getElementById("prodavac-name").value = podaci.Ime;
+        document.getElementById("prodavac-lastname").value = podaci.Prezime;
+        document.getElementById("prodavac-gender").value = podaci.Pol == 0 ? "MUSKI" : "ZENSKI";
+        document.getElementById("prodavac-email").value = podaci.Email;
+        document.getElementById("prodavac-date").value = podaci.Rodjendan.slice(0, 10);
+        $.get('/api/BazaProizvoda', function (data, status) {
+            if (!data) {
+                return
+            };
+            lista = [];
+            let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
+            for (let j in data) {
+                for (let i = 0; i < logedInUser.ListaObjavljenihProizvoda.length; i++) {
+                    if (data[j].Naziv == podaci.ListaObjavljenihProizvoda[i].Naziv) {
+                        lista.push(data[j]);
+                    }
+                }
+            }
+            let filterUrl = location.search;
+            if (filterUrl) {
+                const filterParams = new URLSearchParams(filterUrl);
+                let status = filterParams.get("status");
+                let sortiranje = filterParams.get("sortiranje");
+                for (let i = 0; i < lista.length; i++) {
+                    let changed = "nochange";
+                    if (status != "nista" && status == "dostupan" && lista[i].StatusProizvoda != 0) {
+                        
+                        changed = "change";
+                        lista.splice(i, 1);
+                    }
+                    if (status != "nista" && status == "nedostupan" && lista[i].StatusProizvoda != 1) {
+
+                        changed = "change";
+                        lista.splice(i, 1);
+                    }
+                    if (changed != "nochange") {
+                        i--;
+                    }
+                }
+                if (sortiranje != "relevantno") {
+                    switch (sortiranje) {
+                        case "cena-rastuce":
+                            lista.sort((a, b) => (a.Cena > b.Cena) ? 1 : -1);
+                            break;
+                        case "cena-opadajuce":
+                            lista.sort((a, b) => a.Cena < b.Cena ? 1 : -1);
+                            break;
+                        case "datum-rastuce":
+                            lista.sort((a, b) => new Date(a.Objavljen) > new Date(b.Objavljen) ? 1 : -1);
+                            break;
+                        case "datum-opadajuce":
+                            lista.sort((a, b) => new Date(a.Objavljen) < new Date(b.Objavljen) ? 1 : -1);
+                            break;
+                        case "naziv-rastuce":
+                            lista.sort((a, b) => a.Naziv > b.Naziv ? 1 : -1);
+                            break;
+                        case "naziv-opadajuce":
+                            lista.sort((a, b) => a.Naziv < b.Naziv ? 1 : -1);
+                            break;
+                    }
+                }
+            }
+            listacardova = "";
+            for (let proizvod = 0; proizvod < lista.length; proizvod++) {
+                card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:300px; border: 1px solid black; padding: 5px;}">`;
+                card += `<a href="/Home/Proizvod/${lista[proizvod].Naziv}"  style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 6px; text-decoration: none; color: black;">`;
+                card += `<img src=${lista[proizvod].Slika} style="width:100%; height: 30%;object-fit: contain;"></img>`;
+                card += `<p style="font-size: 1.5rem;">Naziv: ${lista[proizvod].Naziv}</p>`;
+                card += `<p style="font-size: 1.5rem;">Cena: ${lista[proizvod].Cena}</p>`;
+                card += `<p style="font-size: 1.5rem;">Kolicina: ${lista[proizvod].Kolicina}</p>`;
+                card += `<p style="font-size: 1.5rem;">Datum objavljivanja: ${lista[proizvod].Objavljen.slice(0, 10)}</p>`;
+                card += `<p style="font-size: 1.5rem;">Grad: ${lista[proizvod].Grad}</p>`;
+
+                if (lista[proizvod].Kolicina <= 0) {
+                    card += `<p style="color: red; font-size: 1.5rem;">Nedostupan</p>`
+                } else {
+                    card += `<p style="color: green; font-size: 1.5rem;">Dostupan</p>`
+
+                }
+                card += `</a>`;
+                card += `<button name="izmeni-dugme" id="${lista[proizvod].Naziv}-izmeni" style="font-size: 1.5rem; padding: 3px;" >Izmeni</button>`;
+                card += `<button name="obrisi-dugme" id="${lista[proizvod].Naziv}-obrisi" style="font-size: 1.5rem; padding: 3px;" >Obrisi</button>`;
+                card += "</div>";
+                listacardova += card;
+            }
+            $("#proizovdi-prodavac-container").html(listacardova);
+            $(`button[name="obrisi-dugme"]`).click( async function (e) {
+                let proizvod_clicked = e.target.id.slice(0, -7);
+                for (let i = 0; i < logedInUser.ListaObjavljenihProizvoda.length; i++) {
+                    if (proizvod_clicked == logedInUser.ListaObjavljenihProizvoda[i].Naziv) {
+                       
+                        logedInUser.ListaObjavljenihProizvoda.splice(i, 1);
+                        break;
+                    }
+                }
+                await $.ajax({
+                    type: "PUT",
+                    url: "/api/BazaKorisnika",
+                    data: JSON.stringify(logedInUser),
+                    contentType: "application/json"
+
+                })
+                sessionStorage.setItem("userData", JSON.stringify(logedInUser));
+                await $.ajax({
+                    type: "DELETE",
+                    url: `/api/BazaProizvoda?naziv=${proizvod_clicked}`,
+                })
+                location.reload();
+            });
+            $(`button[name="izmeni-dugme"]`).click(function (e) {
+                let proizvod_clicked = e.target.id.slice(0, -7);
+                location.href = `/Prodavac/Izmena/${proizvod_clicked}`;
+            });
+
+
+        })
+    });
+    $("#save_button").on('click', async function (e) {
+
+        let data = JSON.parse(window.sessionStorage.getItem("userData"));
+        const username = document.getElementById("prodavac-username").value;
+        const name = document.getElementById("prodavac-name").value;
+        const password = document.getElementById("prodavac-password").value;
+        const lastname = document.getElementById("prodavac-lastname").value;
+        const gender = document.getElementById("prodavac-gender").value;;
+        const email = document.getElementById("prodavac-email").value;
+        const date = document.getElementById("prodavac-date").value;
+        const role = data.Uloga;
+        const Korisnik = {
+            Korisnicko_ime: username,
+            Lozinka: password,
+            Ime: name,
+            Prezime: lastname,
+            Pol: gender,
+            Email: email,
+            Rodjendan: date,
+            Uloga: role,
+            ListaObjavljenihProizvoda: data.ListaObjavljenihProizvoda,
+        };
+        try {
+             $.ajax({
+                type: "PUT",
+                url: "/api/BazaKorisnika",
+                data: JSON.stringify(Korisnik),
+                contentType: "application/json"
+
+            })
+            window.sessionStorage.setItem("userData", JSON.stringify(Korisnik));
+            location.reload();
+        } catch (error) {
+            console.log(error);
+        }
+
+    });
+    $("#dodaj-button").click(function () {
+        location.href ="/Prodavac/Dodaj"
+    });
+    $("#logout_button").click(function () {
+        sessionStorage.setItem("userData", "");
+        sessionStorage.setItem("logedIn", -1);
+        sessionStorage.setItem("logIn", false);
+        $("#profile").empty();
+        location.href = "/";
+    })
+   
+</script>
 

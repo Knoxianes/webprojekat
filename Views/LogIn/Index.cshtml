@@ -22,7 +22,7 @@
                         sessionStorage.setItem("logedIn", data.Uloga);
                         sessionStorage.setItem("userData", JSON.stringify(data));
                         sessionStorage.setItem("logIn", true);
-                        window.location.href = "Home";
+                        window.location.href = "/Home";
                     } else {
                         $("#login_greska").css("display", "block");
                         $("#korisnicko_ime").css("border-color", "red");

@@ -146,6 +146,8 @@
     <Content Include="Views\Prodavac\Index.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Home\Proizvod.cshtml" />
+    <Content Include="Views\Prodavac\Izmena.cshtml" />
+    <Content Include="Views\Prodavac\Dodaj.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

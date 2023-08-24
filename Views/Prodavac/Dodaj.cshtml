@@ -1,0 +1,75 @@
+﻿<form id="dodaj-form" style="display:flex; flex-direction:column; padding:10px; width:100%; justify-content:center; align-items:center; gap: 10px;">
+    <label style="font-size:1.5rem;">Naziv: <input type="text" id="naziv-input" name="Naziv" style="font-size:1.5rem;padding: 5px;" required /> </label>
+    <label style="font-size:1.5rem;">Cena: <input type="number" min="0" id="cena-input" name="Cena" style="font-size:1.5rem;padding: 5px;" required/></label>
+    <label style="font-size:1.5rem;">Kolicina: <input type="number" id="kolicina-input" name="Kolicina" min="0" style="font-size:1.5rem;padding: 5px;"required /></label>
+    <label style="font-size:1.5rem;">Grad: <input type="text" id="grad-input" name="Grad" style="font-size:1.5rem;padding: 5px;"required /></label>
+    <label style="font-size:1.5rem;">Opis: <textarea rows="5" cols="30" id="opis-input" name="Opis" style="font-size:1.5rem;padding: 5px; resize: none;"required ></textarea></label>
+    <label style="font-size:1.5rem;">Slika: <input type="file" id="file-input" accept="image/png,image/jpeg" style="font-size:1.5rem;padding: 5px;" name="Slika" required> <img id="img-preview" style="object-fit: scale-down; width:100px; height:100px" /></label>
+    <input type="submit" id="dodaj-button" style="font-size:1.5rem; width:25%;" value="Dodaj" />
+</form>
+<script>
+    let image_url = "";
+    $(window).on("load", function () {
+        let podaci = JSON.parse(sessionStorage.getItem("userData"));
+        if (!podaci || podaci.Uloga != 1) {
+            document.location.href = "/Home";
+        }
+        $("#naziv-input").val();
+         $("#cena-input").val();
+         $("#kolicina-input").val();
+        $("#grad-input").val();
+        $("#opis-input").val();
+
+    })
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#img-preview').attr('src', e.target.result);
+                image_url = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#file-input").change(function () {
+        readURL(this);
+    });
+    $("#dodaj-form").on("submit", async function (e) {
+        e.preventDefault();
+        const naziv = $("#naziv-input").val();
+        const cena = $("#cena-input").val();
+        const kolicina = $("#kolicina-input").val();
+        const grad = $("#grad-input").val();
+        const opis = $("#opis-input").val();
+        const Proizvod = {
+            Naziv: naziv,
+            Cena: cena,
+            Kolicina: kolicina,
+            Grad: grad,
+            Opis: opis,
+            Slika: image_url,
+        }
+        await $.ajax({
+            type: "POST",
+            url: "/api/BazaProizvoda",
+            data: JSON.stringify(Proizvod),
+            contentType: "application/json"
+
+        })
+        let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
+        logedInUser.ListaOmiljenihProizvoda.push({ ...Proizvod, ListaRecenzija: [], StatusProizvoda: Proizvod.Kolicina <= 0 ? 1 : 0, Objavljen: new Date() });
+        await $.ajax({
+            type: "PUT",
+            url: "/api/BazaKorisnika",
+            data: JSON.stringify(logedInUser),
+            contentType: "application/json"
+        })
+        
+        sessionStorage.setItem("userData", JSON.stringify(logedInUser));
+        window.location.href = "/Prodavac";
+
+
+
+    });
+</script>

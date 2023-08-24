@@ -18,7 +18,7 @@
                 <option style="font-size: 1.5rem;" value="naziv-rastuce">Naziv rastuce</option>
                 <option style="font-size: 1.5rem;" value="naziv-opadajuce">Naziv opadajuce</option>
             </select>
-            <input type="submit" value="Upotrebite filtere" />
+            <input type="submit" value="Upotrebite filtere" style="font-size: 1.5rem; padding: 10px;" />
         </form>
     </div>
     <div class="products">
@@ -59,7 +59,6 @@
                         }
                         if (min && list[i].Cena < parseInt(min)) {
                             changed = "change";
-                            changed = "change";
                             lista.splice(i, 1);
                         }
                         if (max && lista[i].Cena > parseInt(max)) {
@@ -75,10 +74,8 @@
                         }
                     }
                     if (sortiranje != "relevantno") {
-                        console.log(sortiranje);
                         switch (sortiranje) {
                             case "cena-rastuce":
-                                console.log(sortiranje);
                                 lista.sort((a, b) => (a.Cena > b.Cena) ? 1 : -1);
                                 break;
                             case "cena-opadajuce":
@@ -100,7 +97,6 @@
                     }
                 }
                 let listacardova = "";
-
                 let loggedin = sessionStorage.getItem("logedIn");
                 let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
                 for (let proizvod = 0; proizvod < lista.length; proizvod++) {

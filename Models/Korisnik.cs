@@ -27,7 +27,7 @@ namespace WebProjekat.Models
         private Uloga _uloga;
         private List<Porudzbina> _listaPorudzbina;
         private List<Proizvod> _listaOmiljenihProizvoda;
-        private List<Proizvod> _listaObjavljenihProzivoda;
+        private List<Proizvod> _listaObjavljenihProizvoda;
 
         public Korisnik(string korisnicko_ime, string lozinka, string ime, string prezime, Pol pol, string email, DateTime rodjendan, Uloga uloga)
         {
@@ -41,7 +41,7 @@ namespace WebProjekat.Models
             Uloga = uloga;
             ListaOmiljenihProizvoda = new List<Proizvod>();
             ListaPorudzbina = new List<Porudzbina>();
-            ListaObjavljenihProzivoda = new List<Proizvod>();
+            ListaObjavljenihProizvoda = new List<Proizvod>();
         }
 
         public string Korisnicko_ime { get => _korisnicko_ime; set => _korisnicko_ime = value; }
@@ -82,20 +82,20 @@ namespace WebProjekat.Models
             }
             set => _listaOmiljenihProizvoda = value;
         }
-        public List<Proizvod> ListaObjavljenihProzivoda 
+        public List<Proizvod> ListaObjavljenihProizvoda 
         { 
             get
             {
                 if(Uloga == Uloga.PRODAVAC)
                 {
-                    return _listaObjavljenihProzivoda;
+                    return _listaObjavljenihProizvoda;
                 }
                 else
                 {
                     return null;
                 }
             }
-          set => _listaObjavljenihProzivoda = value;
+          set => _listaObjavljenihProizvoda = value;
         }
     }
 }

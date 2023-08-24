@@ -13,5 +13,14 @@ namespace WebProjekat.Controllers
         {
             return View();
         }
+        public ActionResult Izmena()
+        {
+            return View();
+        }
+        public ActionResult Dodaj()
+        {
+            return View();
+        }
+
     }
 }

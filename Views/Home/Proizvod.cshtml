@@ -51,7 +51,7 @@
                     }
                     for (let j in data.ListaRecenzija) {
                         if (data.ListaRecenzija[j].Recenzent == logedInUser.Korisnicko_ime) {
-                            mozeDatiRecenziju == false;
+                            mozeDatiRecenziju = false;
                         }
                     }
                     if (mozeDatiRecenziju) {
@@ -60,6 +60,39 @@
                         formelemet += `<label style="font-size:1.5rem;width: 95%;"> Recenzija: <textarea  id="textarea-input" rows=5    style="width:90%;font-size: 1.rem; padding:10px;resize:none"></textarea></label>`;
                         formelemet += `<button id="objavi-button" style="font-size:1.5rem; padding:5px; width:50%;">Objavi</button>`;
                         $("#form-container").html(formelemet);
+                        $("#objavi-button").click( async function () {
+                            let naslov = $("#naslov-input").val();
+                            let sadrzaj = $("#textarea-input").val();
+                            if (!naslov) {
+                                $("#naslov-input").css("border-color", "red");
+                                setTimeout(function () {
+                                    $("#naslov-input").css("border-color", "black");
+                                },3000)
+                                return;
+                            }
+                            if (!sadrzaj) {
+                                $("#textarea-input").css("border-color", "red");
+                                setTimeout(function () {
+                                    $("#textarea-input").css("border-color", "black");
+                                }, 3000)
+                                return;
+                            }
+                            const novaRecenzija = {
+                                Recenzent: logedInUser.Korisnicko_ime,
+                                Naslov: naslov,
+                                Sadrzaj: sadrzaj,
+                                Slika: ""
+                            }
+                            data.ListaRecenzija.push(novaRecenzija);
+                            await $.ajax({
+                                type: "PUT",
+                                url: "/api/BazaProizvoda",
+                                data: JSON.stringify(data),
+                                contentType: "application/json"
+
+                            });
+                            location.reload();
+                        })
                     }
                 }
                 let recenzije = "";
@@ -73,11 +106,31 @@
                     recenzija += `<div style="width: 100%;">`;
                     recenzija += `<p style="font-size: 2rem;" >Sadrzaj recenzije: ${data.ListaRecenzija[i].Sadrzaj}</p>`
                     recenzija += `</div>`;
+                    if (logedInUser && data.ListaRecenzija[i].Recenzent == logedInUser.Korisnicko_ime) {
+                        recenzija += `<button id="obrisi-button" style="font-size:1.5rem; padding:5px; width: 25%">Obrisi</button>`;
+                    }
                     recenzija += "</div>";
                     recenzije += recenzija;
 
                 }
                 $("#recenzije-container").html(recenzije);
+                $("#obrisi-button").click(async function () {
+                    for (let k = 0; k < data.ListaRecenzija.length; k++) {
+                        if (data.ListaRecenzija[k].Recenzent == logedInUser.Korisnicko_ime) {
+                            data.ListaRecenzija.splice(k, 1);
+                        }
+                    }
+
+                    await $.ajax({
+                        type: "PUT",
+                        url: "/api/BazaProizvoda",
+                        data: JSON.stringify(data),
+                        contentType: "application/json"
+
+                    });
+                    location.reload();
+
+                })
 
 
 
@@ -86,4 +139,5 @@
             console.log(error);
         }
     })
+  
 </script>
