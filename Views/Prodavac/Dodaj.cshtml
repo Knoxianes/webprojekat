@@ -37,6 +37,7 @@
     });
     $("#dodaj-form").on("submit", async function (e) {
         e.preventDefault();
+        let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
         const naziv = $("#naziv-input").val();
         const cena = $("#cena-input").val();
         const kolicina = $("#kolicina-input").val();
@@ -49,6 +50,7 @@
             Grad: grad,
             Opis: opis,
             Slika: image_url,
+            Korisnicko_ime: logedInUser.Korisnicko_ime
         }
         await $.ajax({
             type: "POST",
@@ -57,7 +59,7 @@
             contentType: "application/json"
 
         })
-        let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
+        
         logedInUser.ListaObjavljenihProizvoda.push({ ...Proizvod, ListaRecenzija: [], StatusProizvoda: Proizvod.Kolicina <= 0 ? 1 : 0, Objavljen: new Date() });
         await $.ajax({
             type: "PUT",

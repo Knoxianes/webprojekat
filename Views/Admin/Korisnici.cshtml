@@ -1,0 +1,173 @@
+﻿<div style="display:flex; flex-direction: column; justify-content:center; align-items: center; padding: 3px; gap: 20px;">
+    <div style="display: flex; flex-direction: column; width: 700px; justify-content: center; gap: 5px; align-items: center;">
+        <h2 style="font-size: 2rem">Filteri</h2>
+        <form id="filteri-prodavac-form" style="display: flex; flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: space-evenly; gap: 5px; align-items: center;">
+            <label style="font-size: 1.5rem;">Ime: <input type="text" name="ime-pretraga" style="font-size:1.5rem; padding:5px;" /></label>
+            <label style="font-size: 1.5rem;">Prezime: <input type="text" name="prezime-pretraga" style="font-size:1.5rem; padding:5px;" /></label>
+            <label style="font-size: 1.5rem;">Datum od: <input type="date" name="datum-od" style="font-size:1.5rem; padding:5px;" /></label>
+            <label style="font-size: 1.5rem;">Datum do: <input type="date" name="datum-do" style="font-size:1.5rem; padding:5px;" /></label>
+            <select style="font-size: 1.5rem;" id="uloga-select" name="uloga">
+                <option style="font-size: 1.5rem;" value="nista">Uloga</option>
+                <option style="font-size: 1.5rem;" value="0">Kupac</option>
+                <option style="font-size: 1.5rem;" value="1">Prodavac</option>
+            </select>
+            <select style="font-size: 1.5rem;" id="sortiranje-select" name="sortiranje">
+                <option style="font-size: 1.5rem;" value="relevantno">Relevantno</option>
+                <option style="font-size: 1.5rem;" value="prezime-rastuce">Prezime rastuce</option>
+                <option style="font-size: 1.5rem;" value="prezime-opadajuce">Prezime opadajuce</option>
+                <option style="font-size: 1.5rem;" value="datum-rastuce">Datum rastuce</option>
+                <option style="font-size: 1.5rem;" value="datum-opadajuce">Datum opadajuce</option>
+                <option style="font-size: 1.5rem;" value="ime-rastuce"> Ime rastuce</option>
+                <option style="font-size: 1.5rem;" value="ime-opadajuce">Ime opadajuce</option>
+            </select>
+            <input type="submit" value="Upotrebite filtere" style="font-size: 1.5rem; padding: 5px;" />
+
+        </form>
+    </div>
+    <div style="display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 20px; align-items: center;">
+        <h2 style="font-size: 2rem">Kupci i Prodavci</h2>
+        <button id="dodaj-button" style="font-size:1.5rem;padding:5px;width:200px;">Dodaj prodavca</button>
+        <div id="kupac-prodavac-container" style="display: flex; flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: space-evenly; gap: 10px; align-items: center;">
+        </div>
+    </div>
+</div>
+<script>
+    $(window).on("load", function () {
+        let podaci = JSON.parse(sessionStorage.getItem("userData"));
+        if (!podaci || podaci.Uloga != 2) {
+            document.location.href = "/Home";
+        }
+        $.get('/api/BazaKorisnika', function (data, status) {
+            let lista = data;
+            let filterUrl = location.search;
+            if (filterUrl) {
+                const filterParams = new URLSearchParams(filterUrl);
+                const ime = filterParams.get("ime-pretraga");
+                const prezime = filterParams.get("prezime-pretraga");
+                const datum_od = filterParams.get("datum-od");
+                const datum_do = filterParams.get("datum-do");
+                const uloga = filterParams.get("uloga");
+                const sortiranje = filterParams.get("sortiranje");
+                for (let i = 0; i < lista.length; i++) {
+                    let changed = "nochange";
+                    if (ime && !lista[i].Ime.includes(ime)) {
+                        changed = "change";
+                          lista.splice(i, 1);
+                    }
+                    if (prezime && !lista[i].Prezime.includes(prezime)) {
+                        changed = "change";
+                        lista.splice(i, 1);
+                    }
+                    if (datum_od && new Date(lista[i].Rodjendan) <= new Date(datum_od)) {
+                        changed = "change";
+                        lista.splice(i, 1);
+                    }
+                    if (datum_do && new Date(lista[i].Rodjendan) >= new Date(datum_do)) {
+                        changed = "change";
+                        lista.splice(i, 1);
+                    }
+                   
+                    if (uloga != "nista" && lista[i].Uloga != uloga) {
+                        changed = "change";
+                        lista.splice(i, 1);
+                    }
+                    if (changed != "nochange") {
+                        i--;
+                    }
+                }
+                if (sortiranje != "relevantno") {
+                    switch (sortiranje) {
+                        case "prezime-rastuce":
+                            lista.sort((a, b) => (a.Prezime > b.Prezime) ? 1 : -1);
+                            break;
+                        case "prezime-opadajuce":
+                            lista.sort((a, b) => a.Prezime < b.Prezime ? 1 : -1);
+                            break;
+                        case "datum-rastuce":
+                            lista.sort((a, b) => new Date(a.Rodjendan) > new Date(b.Rodjendan) ? 1 : -1);
+                            break;
+                        case "datum-opadajuce":
+                            lista.sort((a, b) => new Date(a.Rodjendan) < new Date(b.Rodjendan) ? 1 : -1);
+                            break;
+                        case "ime-rastuce":
+                            lista.sort((a, b) => a.Ime > b.Ime ? 1 : -1);
+                            break;
+                        case "ime-opadajuce":
+                            lista.sort((a, b) => a.Ime < b.Ime ? 1 : -1);
+                            break;
+                    }
+                }
+            }
+            listacardova = "";
+            for (let korisnik = 0; korisnik < lista.length; korisnik++) {
+                if (lista[korisnik].Uloga != 2) {
+                    card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:300px; border: 1px solid black; padding: 5px;}">`;
+                    card += `<p style="font-size: 1.5rem;">Korisnicko ime: ${lista[korisnik].Korisnicko_ime}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Ime: ${lista[korisnik].Ime}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Prezime: ${lista[korisnik].Prezime}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Rodjendan: ${lista[korisnik].Rodjendan.slice(0, 10)}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Uloga: ${lista[korisnik].Uloga == 0 ? "Kupac" : "Prodavac"}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Pol: ${lista[korisnik].Pol == 0 ? "Muski" : "Zenski"}</p>`;
+                    card += `<button name="izmeni-dugme" id="${lista[korisnik].Korisnicko_ime}-izmeni" style="font-size: 1.5rem; padding: 3px;" >Izmeni</button>`;
+                    card += `<button name="obrisi-dugme" id="${lista[korisnik].Korisnicko_ime}-${lista[korisnik].Uloga}-obrisi" style="font-size: 1.5rem; padding: 3px;" >Obrisi</button>`;
+                    card += "</div>";
+                    listacardova += card;
+                }
+
+            }
+            $("#kupac-prodavac-container").html(listacardova);
+            $(`button[name="obrisi-dugme"]`).click(async function (e) {
+
+                let korisnik_clicked = e.target.id.split("-")[0];
+                let uloga = e.target.id.split("-")[1];
+                $.get("/api/BazaProizvoda", async function (data, status) {
+                    if (!data) {
+                        return
+                    }
+                    if (uloga == 1) {
+                        for (let proizvod in data) {
+                            if (data[proizvod].Korisnicko_ime == korisnik_clicked) {
+                                await $.ajax({
+                                    type: "DELETE",
+                                    url: `/api/BazaProizvoda?naziv=${data[proizvod].Naziv}`,
+                                })
+                            }
+                        }
+                    } else {
+                        
+                        $.get(`/api/BazaKorisnika?korisnicko_ime=${korisnik_clicked}`, async function (korisnik, status) {
+                            for (let porudzbina in korisnik.ListaPorudzbina) {
+                                for (let proizvod in data) {
+                                    if (korisnik.ListaPorudzbina[porudzbina].StatusPorudzbine == 0 && korisnik.ListaPorudzbina[porudzbina].Proizvod.Naziv == data[proizvod].Naziv) {
+                                        data[proizvod].Kolicina += 1;
+                                        await $.ajax({
+                                            type: "PUT",
+                                            url: "/api/BazaProizvoda",
+                                            data: JSON.stringify(data[proizvod]),
+                                            contentType: "application/json"
+                                        });
+                                    }
+                                }
+                            }
+                        })
+                    }
+                   
+                })
+                
+                await $.ajax({
+                    type: "DELETE",
+                   url: `/api/BazaKorisnika?korisnicko_ime=${korisnik_clicked}`,
+                })
+                location.reload();
+            });
+            $(`button[name="izmeni-dugme"]`).click(function (e) {
+                let korisnik_clicked = e.target.id.slice(0, -7);
+                location.href = `/Admin/IzmenaKorisnika/${korisnik_clicked}`;
+            });
+        })
+    })
+   
+    $("#dodaj-button").click(function () {
+        location.href = "/Admin/Dodaj"
+    });
+</script>

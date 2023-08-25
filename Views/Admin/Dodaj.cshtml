@@ -1,5 +1,5 @@
 ﻿<div style="height: calc(100vh - 7.4rem); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.5rem; font-size: 2rem;">
-    <h1 style="font-size: 2rem; padding: 2px">SignUp</h1>
+    <h1 style="font-size: 2rem; padding: 2px">Dodaj Prodavca</h1>
     <form id="signup-form" style="display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:0.5rem;">
         <label style="font-size: 2rem; padding: 2px;  ">Korisnicko ime: <input type="text" id="username" style="font-size: 1.5rem; padding: 2px" required /></label>
         <label style="font-size: 2rem; padding: 2px;  ">Sifra: <input type="password" id="password" style="font-size: 1.5rem; padding: 2px" required /></label>
@@ -14,9 +14,9 @@
         </label>
         <label style="font-size: 2rem; padding: 2px;  ">Email: <input type="email" id="email" style="font-size: 1.5rem; padding: 2px" required /></label>
         <label style="font-size: 2rem; padding: 2px;  ">Kada ste rodjeni: <input type="date" id="date" style="font-size: 1.5rem; padding: 2px" required /></label>
-        <button type="submit" id="signup_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">SignUp</button>
+        <button type="submit" id="signup_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">Dodaj</button>
     </form>
-    <button id="login-button" style="font-size: 1.5rem; padding: 4px; width: 15rem;">LogIn</button>
+    <button id="nazad-button" style="font-size: 1.5rem; padding: 4px; width: 15rem;">Nazad</button>
 </div>
 <script>
     $("#signup-form").on('submit', function (e) {
@@ -29,7 +29,7 @@
         const gender = document.getElementById("gender").value;;
         const email = document.getElementById("email").value;
         const date = document.getElementById("date").value;
-        const role = 0;
+        const role = 1;
         const Korisnik = {
             Korisnicko_ime: username,
             Lozinka: password,
@@ -48,15 +48,13 @@
                 contentType: "application/json"
 
             })
-            window.location.href = "/LogIn";
+            window.location.href = "/Admin/Korisnici";
         } catch (error) {
             console.log(error);
         }
 
     });
-    $("#login-button").click(function () {
-        location.href = "/LogIn";
+    $("#nazad-button").click(function () {
+        location.href = "/Admin/Korisnici";
     })
 </script>
-
-

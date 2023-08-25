@@ -81,7 +81,9 @@
                                 Recenzent: logedInUser.Korisnicko_ime,
                                 Naslov: naslov,
                                 Sadrzaj: sadrzaj,
-                                Slika: ""
+                                Slika: "",
+                                Odobreno: false,
+                                Proizvod: data.Naziv
                             }
                             data.ListaRecenzija.push(novaRecenzija);
                             await $.ajax({
@@ -97,20 +99,22 @@
                 }
                 let recenzije = "";
                 for (let i in data.ListaRecenzija) {
-                    let recenzija = `<div style="display:flex; flex-direction: column; width: 95%; padding:10px; border: 1px solid black; gap: 3px">`;
-                    recenzija += `<div style="display:flex;gap:50px;width: 100%;">`;
-                    recenzija += `<label style="font-size: 2rem;" >Naslov: ${data.ListaRecenzija[i].Naslov}</label>`
-                    recenzija += `<label style="font-size: 2rem;">Recenzent: ${data.ListaRecenzija[i].Recenzent}</label>`
-                    recenzija += `</div>`;
-                    recenzija += "<hr/>";
-                    recenzija += `<div style="width: 100%;">`;
-                    recenzija += `<p style="font-size: 2rem;" >Sadrzaj recenzije: ${data.ListaRecenzija[i].Sadrzaj}</p>`
-                    recenzija += `</div>`;
-                    if (logedInUser && data.ListaRecenzija[i].Recenzent == logedInUser.Korisnicko_ime) {
-                        recenzija += `<button id="obrisi-button" style="font-size:1.5rem; padding:5px; width: 25%">Obrisi</button>`;
+                    if (data.ListaRecenzija[i].Odobreno == true) {
+                        let recenzija = `<div style="display:flex; flex-direction: column; width: 95%; padding:10px; border: 1px solid black; gap: 3px">`;
+                        recenzija += `<div style="display:flex;gap:50px;width: 100%;">`;
+                        recenzija += `<label style="font-size: 2rem;" >Naslov: ${data.ListaRecenzija[i].Naslov}</label>`
+                        recenzija += `<label style="font-size: 2rem;">Recenzent: ${data.ListaRecenzija[i].Recenzent}</label>`
+                        recenzija += `</div>`;
+                        recenzija += "<hr/>";
+                        recenzija += `<div style="width: 100%;">`;
+                        recenzija += `<p style="font-size: 2rem;" >Sadrzaj recenzije: ${data.ListaRecenzija[i].Sadrzaj}</p>`
+                        recenzija += `</div>`;
+                        if (logedInUser && data.ListaRecenzija[i].Recenzent == logedInUser.Korisnicko_ime) {
+                            recenzija += `<button id="obrisi-button" style="font-size:1.5rem; padding:5px; width: 25%">Obrisi</button>`;
+                        }
+                        recenzija += "</div>";
+                        recenzije += recenzija;
                     }
-                    recenzija += "</div>";
-                    recenzije += recenzija;
 
                 }
                 $("#recenzije-container").html(recenzije);

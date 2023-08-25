@@ -148,6 +148,12 @@
     <Content Include="Views\Home\Proizvod.cshtml" />
     <Content Include="Views\Prodavac\Izmena.cshtml" />
     <Content Include="Views\Prodavac\Dodaj.cshtml" />
+    <Content Include="Views\Admin\Korisnici.cshtml" />
+    <Content Include="Views\Admin\Proizvodi.cshtml" />
+    <Content Include="Views\Admin\Porudzbine.cshtml" />
+    <Content Include="Views\Admin\Recenzije.cshtml" />
+    <Content Include="Views\Admin\Dodaj.cshtml" />
+    <Content Include="Views\Admin\IzmenaKorisnika.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -13,5 +13,29 @@ namespace WebProjekat.Controllers
         {
             return View();
         }
+        public ActionResult Korisnici()
+        {
+            return View();
+        }
+        public ActionResult Proizvodi()
+        {
+            return View();
+        }
+        public ActionResult Porudzbine()
+        {
+            return View();
+        }
+        public ActionResult Recenzije()
+        {
+            return View();
+        }
+        public ActionResult Dodaj()
+        {
+            return View();
+        }
+        public ActionResult IzmenaKorisnika()
+        {
+            return View();
+        }
     }
 }

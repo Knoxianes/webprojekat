@@ -20,10 +20,11 @@ namespace WebProjekat.Models
         private DateTime _objavljen;
         private string _grad;
         private StatusProizvoda _statusProizvoda;
+        private string _korisnicko_ime;
 
         private List<Recenzija> _listaRecenzija;
 
-        public Proizvod(string naziv, double cena, uint kolicina, string opis, string slika, string grad)
+        public Proizvod(string naziv, double cena, uint kolicina, string opis, string slika, string grad,string korisnicko_ime)
         {
             _naziv = naziv;
             _cena = cena;
@@ -31,6 +32,7 @@ namespace WebProjekat.Models
             _opis = opis;
             _slika = slika;
             _grad = grad;
+            _korisnicko_ime = korisnicko_ime;
             Objavljen = DateTime.Now;
             if(kolicina <= 0)
             {
@@ -52,5 +54,6 @@ namespace WebProjekat.Models
         public string Grad { get => _grad; set => _grad = value; }
         public StatusProizvoda StatusProizvoda { get => _statusProizvoda; set => _statusProizvoda = value; }
         public List<Recenzija> ListaRecenzija { get => _listaRecenzija; set => _listaRecenzija = value; }
+        public string Korisnicko_ime { get => _korisnicko_ime; set => _korisnicko_ime = value; }
     }
 }

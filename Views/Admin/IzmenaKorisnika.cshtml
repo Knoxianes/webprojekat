@@ -1,0 +1,86 @@
+﻿<div style="height: calc(100vh - 7.4rem); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.5rem; font-size: 2rem;">
+    <div id="form" style="position: sticky; display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-start; gap:0.5rem; margin-left: 20px;">
+        <h1 style="font-size: 3rem; padding: 2px;">Profil</h1>
+        <label style="font-size: 2rem; padding: 2px;  ">Korisnicko ime: <input type="text" id="username" style="font-size: 1.5rem; padding: 2px" disabled /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Sifra: <input type="password" id="password" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Ime: <input type="text" id="name" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Prezime: <input type="text" id="lastname" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">
+            Pol:
+            <select style="font-size: 1.5rem; padding: 2px" id="gender" required>
+                <option value="MUSKI">Muski</option>
+                <option value="ZENSKI">Zenski</option>
+            </select>
+        </label>
+        <label style="font-size: 2rem; padding: 2px;  ">Email: <input type="email" id="email" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <label style="font-size: 2rem; padding: 2px;  ">Kada ste rodjeni: <input type="date" id="date" style="font-size: 1.5rem; padding: 2px" required /></label>
+        <button type="submit" id="save_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">Save</button>
+        <button id="nazad_button" style="font-size: 1.5rem; padding: 4px; width:15rem;">Nazad</button>
+    </div>
+</div>
+<script>
+    let korisnik;
+    $(window).on("load", async function () {
+        let podaci = JSON.parse(window.sessionStorage.getItem("userData"));
+        if (!podaci || podaci.Uloga != 2) {
+            document.location.href = "/Home";
+        }
+        const korisnicko_ime = location.pathname.split("/")[3];
+        if (!korisnicko_ime) {
+            location.href = "/";
+        }
+        $.get(`/api/BazaKorisnika?korisnicko_ime=${korisnicko_ime}`, function (data, status) {
+            if (!data) {
+                location.href = "/";
+            }
+            korisnik = data;
+            document.getElementById("username").value = data.Korisnicko_ime;
+            document.getElementById("password").value = data.Lozinka;
+            document.getElementById("name").value = data.Ime;
+            document.getElementById("lastname").value = data.Prezime;
+            document.getElementById("gender").value = data.Pol == 0 ? "MUSKI" : "ZENSKI";
+            document.getElementById("email").value = data.Email;
+            document.getElementById("date").value = data.Rodjendan.slice(0, 10);
+        })
+    });
+    $("#save_button").on('click', async function (e) {
+
+        const username = document.getElementById("username").value;
+        const name = document.getElementById("name").value;
+        const password = document.getElementById("password").value;
+        const lastname = document.getElementById("lastname").value;
+        const gender = document.getElementById("gender").value;;
+        const email = document.getElementById("email").value;
+        const date = document.getElementById("date").value;
+        const role = korisnik.Uloga;
+        const Korisnik = {
+            Korisnicko_ime: username,
+            Lozinka: password,
+            Ime: name,
+            Prezime: lastname,
+            Pol: gender,
+            Email: email,
+            Rodjendan: date,
+            Uloga: role,
+            ListaPorudzbina: korisnik.ListaPorudzbina,
+            ListaOmiljenihProizvoda: korisnik.ListaOmiljenihProizvoda,
+            ListaObjavljenihProizvoda: korisnik.ListaObjavljenihProizvoda
+        };
+        try {
+            await $.ajax({
+                type: "PUT",
+                url: "/api/BazaKorisnika",
+                data: JSON.stringify(Korisnik),
+                contentType: "application/json"
+
+            })
+            location.reload();
+        } catch (error) {
+            console.log(error);
+        }
+
+    });
+    $("#nazad_button").click(function () {
+        location.href = "/Admin/Korisnici";
+    })
+</script>
