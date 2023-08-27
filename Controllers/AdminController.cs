@@ -37,5 +37,9 @@ namespace WebProjekat.Controllers
         {
             return View();
         }
+        public ActionResult IzmenaProizvoda()
+        {
+            return View();
+        }
     }
 }

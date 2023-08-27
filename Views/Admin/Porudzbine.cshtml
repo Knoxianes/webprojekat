@@ -1,1 +1,85 @@
-﻿
+﻿<div style="display:flex; flex-direction: column; justify-content:center; align-items: center; padding: 3px; gap: 20px;">
+    <div style="display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 5px; align-items: center;">
+        <h2 style="font-size: 2rem">Porudzbine</h2>
+        <div id="porudzbine-container" style="display: flex; flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: space-evenly; gap: 5px; align-items: center;">
+        </div>
+    </div>
+</div>
+<script>
+    $(window).on("load", async function () {
+        let podaci = JSON.parse(window.sessionStorage.getItem("userData"));
+        if (!podaci || podaci.Uloga != 2) {
+            document.location.href = "/Home";
+        }
+        let listacardovaporudzbina = "";
+        $.get("/api/BazaKorisnika", function (data, status) {
+            for (let korisnik in data) {
+                podaci = data[korisnik];
+                for (let porudzbina in podaci.ListaPorudzbina) {
+                    card = `<div style="display: flex;flex-direction: column; justify-content: space-around; align-items: center; gap: 5px; width:250px; height: 400px;; border: 1px solid black;padding: 5px;">`;
+                    card += `<a href="/Home/Proizvod/${podaci.ListaPorudzbina[porudzbina].Proizvod.Naziv}"  style="display: flex;flex-direction: column; justify-content: space-around; align-items: center; gap: 5px; text-decoration: none; color: black;">`;
+                    card += `<img src=${podaci.ListaPorudzbina[porudzbina].Proizvod.Slika} style="width:200px; height: 200px;object-fit: contain;"></img>`;
+                    card += `<p style="font-size: 1.5rem;">Naziv: ${podaci.ListaPorudzbina[porudzbina].Proizvod.Naziv}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Kolicina: ${podaci.ListaPorudzbina[porudzbina].Kolicina}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Cena: ${podaci.ListaPorudzbina[porudzbina].Proizvod.Cena}</p>`;
+                    card += `<p style="font-size: 1.5rem;">Status: ${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 0 ? "Aktivan" : podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 1 ? "Izvrsena" : "Otkazana"} ${podaci.ListaPorudzbina[porudzbina].DatumPorudzbine.slice(0, 10)}</p>`;
+                    card += "</a>";
+                    card += `<button name="izvrsen-button" id="${porudzbina}-${podaci.Korisnicko_ime}" style="font-size: 1.5rem; padding: 10px; background-color: green;${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 0 ? "" : "display: none"}">Izvrsena</button>`
+                    card += `<button name="okazan-button" id="${porudzbina}-${podaci.Korisnicko_ime}" style="font-size: 1.5rem; padding: 10px; background-color: red;${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 0 ? "" : "display: none"}">Oktazana</button>`
+                    card += "</div>";
+                    listacardovaporudzbina += card;
+                }
+            }
+            $("#porudzbine-container").html(listacardovaporudzbina);
+            $(`button[name="izvrsen-button"]`).click(async function (e) {
+                let index = e.target.id.split("-")[0];
+                let korisnicko_ime = e.target.id.split("-")[1];
+                $.get(`/api/BazaKorisnika?korisnicko_ime=${korisnicko_ime}`, async function (podaci, status) {
+                    podaci.ListaPorudzbina[index].StatusPorudzbine = 1;
+                    try {
+                        await $.ajax({
+                            type: "PUT",
+                            url: "/api/BazaKorisnika",
+                            data: JSON.stringify(podaci),
+                            contentType: "application/json"
+
+                        })
+                        location.reload();
+                    } catch (error) {
+                        console.log(error);
+                    }
+                })
+            });
+            $(`button[name="okazan-button"]`).click(async function (e) {
+                let index = e.target.id.split("-")[0];
+                let korisnicko_ime = e.target.id.split("-")[1];
+                $.get(`/api/BazaKorisnika?korisnicko_ime=${korisnicko_ime}`, async function (podaci, status) {
+                    podaci.ListaPorudzbina[index].StatusPorudzbine = 2;
+                    try {
+                        await $.ajax({
+                           type: "PUT",
+                            url: "/api/BazaKorisnika",
+                            data: JSON.stringify(podaci),
+                            contentType: "application/json"
+
+                       })
+                        await $.get(`/api/BazaProizvoda?naziv=${podaci.ListaPorudzbina[index].Proizvod.Naziv}`, async function (data, status) {
+                            data.Kolicina += 1;
+                            await $.ajax({
+                                type: "PUT",
+                                url: "/api/BazaProizvoda",
+                                data: JSON.stringify(data),
+                                contentType: "application/json"
+
+                            })
+                        })
+                        location.reload();
+                    } catch (error) {
+                        console.log(error);
+                    }
+                });
+            })
+        })
+       
+    })
+</script>

@@ -9,21 +9,19 @@
 </form>
 <script>
     let image_url = "";
-
     $(window).on("load", function () {
         let podaci = JSON.parse(sessionStorage.getItem("userData"));
-        
-        if (!podaci || podaci.Uloga != 1) {
-            document.location.href = "/Home";
-        }
-        const nazivproizvoda = location.pathname.split("/")[3];
-        if (!nazivproizvoda) {
+
+        if (!podaci || podaci.Uloga != 2) {
             location.href = "/";
         }
+        const tmp = location.pathname.split("/")[3];
+        if (!tmp) {
+            location.href = "/";
+        }
+        const nazivproizvoda = tmp.split("-")[0];
+        const korisnicko_ime = tmp.split("-")[1];
         $.get(`/api/BazaProizvoda?naziv=${nazivproizvoda}`, function (data, status) {
-            if (!data) {
-                location.href = "/";
-            }
             $("#naziv-input").val(data.Naziv);
             $("#cena-input").val(data.Cena);
             $("#kolicina-input").val(data.Kolicina);
@@ -48,7 +46,7 @@
                     ListaRecenzija: data.ListaRecenzija,
                     Objavljen: data.Objavljen,
                     StatusProizvoda: kolicina <= 0 ? 1 : 0,
-                    Korisnicko_ime: podaci.Korisnicko_ime
+                    Korisnicko_ime: data.Korisnicko_ime
                 }
                 await $.ajax({
                     type: "PUT",
@@ -57,33 +55,31 @@
                     contentType: "application/json"
 
                 })
-                let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
-                for (let i = 0; i < logedInUser.ListaObjavljenihProizvoda.length; i++) {
-                    if (logedInUser.ListaObjavljenihProizvoda[i].Naziv == Proizvod.Naziv) {
-                        logedInUser.ListaObjavljenihProizvoda[i].Naziv = Proizvod.Naziv;
-                        logedInUser.ListaObjavljenihProizvoda[i].Cena = Proizvod.Cena;
-                        logedInUser.ListaObjavljenihProizvoda[i].Kolicina = Proizvod.Kolicina;
-                        logedInUser.ListaObjavljenihProizvoda[i].Slika = Proizvod.Slika;
-                        logedInUser.ListaObjavljenihProizvoda[i].Grad = Proizvod.Grad;
-                        logedInUser.ListaObjavljenihProizvoda[i].Opis = Proizvod.Opis;
-                        logedInUser.ListaObjavljenihProizvoda[i].StatusProizvoda = Proizvod.Kolicina <= 0 ? 1 : 0;
-                        logedInUser.ListaObjavljenihProizvoda[i].Korisnicko_ime = Proizvod.Korisnicko_ime;
-                        break;
+                await $.get(`/api/BazaKorisnika?korisnicko_ime=${korisnicko_ime}`, async function (logedInUser, status) {
+                    for (let i = 0; i < logedInUser.ListaObjavljenihProizvoda.length; i++) {
+                        if (logedInUser.ListaObjavljenihProizvoda[i].Naziv == Proizvod.Naziv) {
+                            logedInUser.ListaObjavljenihProizvoda[i].Naziv = Proizvod.Naziv;
+                            logedInUser.ListaObjavljenihProizvoda[i].Cena = Proizvod.Cena;
+                            logedInUser.ListaObjavljenihProizvoda[i].Kolicina = Proizvod.Kolicina;
+                            logedInUser.ListaObjavljenihProizvoda[i].Slika = Proizvod.Slika;
+                            logedInUser.ListaObjavljenihProizvoda[i].Grad = Proizvod.Grad;
+                            logedInUser.ListaObjavljenihProizvoda[i].Opis = Proizvod.Opis;
+                            logedInUser.ListaObjavljenihProizvoda[i].StatusProizvoda = Proizvod.Kolicina <= 0 ? 1 : 0;
+                            logedInUser.ListaObjavljenihProizvoda[i].Korisnicko_ime = Proizvod.Korisnicko_ime;
+                            break;
+                        }
                     }
-                }
-                await $.ajax({
-                    type: "PUT",
-                    url: "/api/BazaKorisnika",
-                    data: JSON.stringify(logedInUser),
-                    contentType: "application/json"
+                    await $.ajax({
+                        type: "PUT",
+                        url: "/api/BazaKorisnika",
+                        data: JSON.stringify(logedInUser),
+                        contentType: "application/json"
+                    })
+                    window.location.href = "/Admin/Proizvodi";
                 })
 
-                sessionStorage.setItem("userData", JSON.stringify(logedInUser));
-                window.location.href = "/Prodavac";
-            });
-
+            })
         })
-
     })
     function readURL(input) {
         if (input.files && input.files[0]) {
@@ -100,3 +96,4 @@
         readURL(this);
     });
 </script>
+

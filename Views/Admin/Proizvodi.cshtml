@@ -1,1 +1,140 @@
-﻿
+﻿<div style="display:flex; flex-direction: column; justify-content:center; align-items: center; padding: 3px; gap: 20px;">
+    <div style="display: flex; flex-direction: column; width: 700px; justify-content: center; gap: 5px; align-items: center;">
+        <h2 style="font-size: 2rem">Filteri</h2>
+        <form id="filteri-prodavac-form" style="display: flex; flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: space-evenly; gap: 5px; align-items: center;">
+            <select style="font-size: 1.5rem;" id="status-select" name="status">
+                <option style="font-size: 1.5rem;" value="nista">Nista</option>
+                <option style="font-size: 1.5rem;" value="dostupan">Dostupan</option>
+                <option style="font-size: 1.5rem;" value="nedostupan">Nedostupan</option>
+            </select>
+            <select style="font-size: 1.5rem;" id="sortiranje-select" name="sortiranje">
+                <option style="font-size: 1.5rem;" value="relevantno">Relevantno</option>
+                <option style="font-size: 1.5rem;" value="cena-rastuce">Cena rastuce</option>
+                <option style="font-size: 1.5rem;" value="cena-opadajuce">Cena opadajuce</option>
+                <option style="font-size: 1.5rem;" value="datum-rastuce">Datum rastuce</option>
+                <option style="font-size: 1.5rem;" value="datum-opadajuce">Datum opadajuce</option>
+                <option style="font-size: 1.5rem;" value="naziv-rastuce">Naziv rastuce</option>
+                <option style="font-size: 1.5rem;" value="naziv-opadajuce">Naziv opadajuce</option>
+            </select>
+            <input type="submit" value="Upotrebite filtere" style="font-size: 1.5rem; padding: 5px;" />
+
+        </form>
+    </div>
+    <div style="display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 5px; align-items: center;">
+        <h2 style="font-size: 2rem">Objavljeni proizvodi</h2>
+        <div id="proizovdi-prodavac-container" style="display: flex; flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: space-evenly; gap: 5px; align-items: center;">
+        </div>
+    </div>
+</div>
+<script>
+    $(window).on("load", function () {
+        let podaci = JSON.parse(window.sessionStorage.getItem("userData"));
+        if (!podaci || podaci.Uloga != 2) {
+            document.location.href = "Home";
+        }
+        $.get('/api/BazaProizvoda', function (data, status) {
+            if (!data) {
+                return
+            };
+            lista = data;
+            let filterUrl = location.search;
+            if (filterUrl) {
+                const filterParams = new URLSearchParams(filterUrl);
+                let status = filterParams.get("status");
+                let sortiranje = filterParams.get("sortiranje");
+                for (let i = 0; i < lista.length; i++) {
+                    let changed = "nochange";
+                    if (status != "nista" && status == "dostupan" && lista[i].StatusProizvoda != 0) {
+
+                        changed = "change";
+                        lista.splice(i, 1);
+                    }
+                    if (status != "nista" && status == "nedostupan" && lista[i].StatusProizvoda != 1) {
+
+                        changed = "change";
+                        lista.splice(i, 1);
+                    }
+                    if (changed != "nochange") {
+                        i--;
+                    }
+                }
+                if (sortiranje != "relevantno") {
+                    switch (sortiranje) {
+                        case "cena-rastuce":
+                            lista.sort((a, b) => (a.Cena > b.Cena) ? 1 : -1);
+                            break;
+                        case "cena-opadajuce":
+                            lista.sort((a, b) => a.Cena < b.Cena ? 1 : -1);
+                            break;
+                        case "datum-rastuce":
+                            lista.sort((a, b) => new Date(a.Objavljen) > new Date(b.Objavljen) ? 1 : -1);
+                            break;
+                        case "datum-opadajuce":
+                            lista.sort((a, b) => new Date(a.Objavljen) < new Date(b.Objavljen) ? 1 : -1);
+                            break;
+                        case "naziv-rastuce":
+                            lista.sort((a, b) => a.Naziv > b.Naziv ? 1 : -1);
+                            break;
+                        case "naziv-opadajuce":
+                            lista.sort((a, b) => a.Naziv < b.Naziv ? 1 : -1);
+                            break;
+                    }
+                }
+            }
+            listacardova = "";
+            for (let proizvod = 0; proizvod < lista.length; proizvod++) {
+                card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 5px; width:300px;height: 400px; border: 1px solid black; padding: 5px;}">`;
+                card += `<a href="/Home/Proizvod/${lista[proizvod].Naziv}"  style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 6px; text-decoration: none; color: black;">`;
+                card += `<img src=${lista[proizvod].Slika} style="width:100%; height: 30%;object-fit: contain;"></img>`;
+                card += `<p style="font-size: 1.5rem;">Naziv: ${lista[proizvod].Naziv}</p>`;
+                card += `<p style="font-size: 1.5rem;">Cena: ${lista[proizvod].Cena}</p>`;
+                card += `<p style="font-size: 1.5rem;">Kolicina: ${lista[proizvod].Kolicina}</p>`;
+                card += `<p style="font-size: 1.5rem;">Datum objavljivanja: ${lista[proizvod].Objavljen.slice(0, 10)}</p>`;
+                card += `<p style="font-size: 1.5rem;">Grad: ${lista[proizvod].Grad}</p>`;
+
+                if (lista[proizvod].Kolicina <= 0) {
+                    card += `<p style="color: red; font-size: 1.5rem;">Nedostupan</p>`
+                } else {
+                    card += `<p style="color: green; font-size: 1.5rem;">Dostupan</p>`
+
+                }
+                card += `</a>`;
+                card += `<button name="izmeni-dugme" id="${lista[proizvod].Naziv}-${lista[proizvod].Korisnicko_ime}-izmeni" style="font-size: 1.5rem; padding: 3px;" >Izmeni</button>`;
+                card += `<button name="obrisi-dugme" id="${lista[proizvod].Naziv}-${lista[proizvod].Korisnicko_ime}-obrisi" style="font-size: 1.5rem; padding: 3px;" >Obrisi</button>`;
+                card += "</div>";
+                listacardova += card;
+            }
+            $("#proizovdi-prodavac-container").html(listacardova);
+            $(`button[name="obrisi-dugme"]`).click(async function (e) {
+                let proizvod_clicked = e.target.id.split("-")[0];
+                let korisnicko_ime = e.target.id.split("-")[1];
+                await $.get(`/api/BazaKorisnika?korisnicko_ime=${korisnicko_ime}`,async  function (logedInUser, status) {
+                    for (let i = 0; i < logedInUser.ListaObjavljenihProizvoda.length; i++) {
+                        if (proizvod_clicked == logedInUser.ListaObjavljenihProizvoda[i].Naziv) {
+
+                            logedInUser.ListaObjavljenihProizvoda.splice(i, 1);
+                            break;
+                        }
+                    }
+                    await $.ajax({
+                        type: "PUT",
+                        url: "/api/BazaKorisnika",
+                        data: JSON.stringify(logedInUser),
+                        contentType: "application/json"
+
+                    })
+                })
+                await $.ajax({
+                    type: "DELETE",
+                    url: `/api/BazaProizvoda?naziv=${proizvod_clicked}`,
+                })
+                location.reload();
+            });
+            $(`button[name="izmeni-dugme"]`).click(function (e) {
+                let proizvod_clicked = e.target.id.split("-")[0];
+                let korisnicko_ime = e.target.id.split("-")[1];
+                location.href = `/Admin/IzmenaProizvoda/${proizvod_clicked}-${korisnicko_ime}`;
+            });
+        })
+    })
+</script>

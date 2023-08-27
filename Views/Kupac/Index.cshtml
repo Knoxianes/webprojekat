@@ -54,7 +54,7 @@
             card += `<p style="font-size: 1.5rem;">Cena: ${podaci.ListaPorudzbina[porudzbina].Proizvod.Cena}</p>`;
             card += `<p style="font-size: 1.5rem;">Status: ${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 0 ? "Aktivan" : podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 1 ? "Izvrsena" : "Otkazana"} ${podaci.ListaPorudzbina[porudzbina].DatumPorudzbine.slice(0, 10)}</p>`;
             card += "</a>";
-            card += `<button name="izvrsen-button" id="${porudzbina}" style="font-size: 1.5rem; padding: 10px; background-color: green;${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine != 0 ? "display: none" : ""}">Izvrsena?</button>`
+            card += `<button name="izvrsen-button" id="${porudzbina}" style="font-size: 1.5rem; padding: 10px; background-color: green;${podaci.ListaPorudzbina[porudzbina].StatusPorudzbine == 0 ? "" : "display: none"}">Izvrsena?</button>`
             card += "</div>";
             listacardovaporudzbina += card;
         }
@@ -104,7 +104,7 @@
             let index = e.target.id;
             podaci.ListaPorudzbina[index].StatusPorudzbine = 1;
             try {
-                await $.ajax({
+                await $.ajax({ 
                     type: "PUT",
                     url: "/api/BazaKorisnika",
                     data: JSON.stringify(podaci),

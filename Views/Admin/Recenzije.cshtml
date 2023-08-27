@@ -1,1 +1,77 @@
-﻿
+﻿<div id="recenzije-container" style="display: flex; width:100%; gap:15px; flex-direction: column;padding:20px;">
+    
+</div>
+<script>
+    $(window).on("load", function () {
+        $.get(`/api/BazaProizvoda`, function (data, status) {
+            if (!data) {
+                location.href = "/";
+            }
+            let recenzije = `<h1 style="font-size:3rem;">Recenzije koje cekaju da budu odobrene:</h1>`;
+            for (proizvod in data) {
+                podatak = data[proizvod];
+                for (let i in podatak.ListaRecenzija) {
+                    if (podatak.ListaRecenzija[i].Odobreno == false) {
+                        let recenzija = `<div style="display:flex; flex-direction: column; width: 95%; padding:10px; border: 1px solid black; gap: 3px">`;
+                        recenzija += `<div style="display:flex;gap:50px;width: 100%;">`;
+                        recenzija += `<label style="font-size: 2rem;" >Naslov: ${podatak.ListaRecenzija[i].Naslov}</label>`
+                        recenzija += `<label style="font-size: 2rem;">Recenzent: ${podatak.ListaRecenzija[i].Recenzent}</label>`
+                        recenzija += `<label style="font-size: 2rem;">Proizvod: ${podatak.ListaRecenzija[i].Proizvod}</label>`
+                        recenzija += `</div>`;
+                        recenzija += "<hr/>";
+                        recenzija += `<div style="width: 100%;">`;
+                        recenzija += `<p style="font-size: 2rem;" >Sadrzaj recenzije: ${podatak.ListaRecenzija[i].Sadrzaj}</p>`
+                        recenzija += `</div>`;
+                        recenzija += `<div style="width: 100%; display:flex; gap: 20px; padding:10px;">`;
+                        recenzija += `<button name="odobri-button" id="${podatak.ListaRecenzija[i].Recenzent}-${podatak.ListaRecenzija[i].Proizvod}-odobri" style="font-size:1.5rem; background-color: blue;padding: 5px; color: snow; width: 100px;">Odobri</button>`;
+                        recenzija += `<button name="odbi-button" id="${podatak.ListaRecenzija[i].Recenzent}-${podatak.ListaRecenzija[i].Proizvod}-odbi" style="font-size:1.5rem;  background-color: red; padding: 5px; color: snow;width: 100px;">Odbi</button>`;
+                        recenzija += `</div>`;
+                        recenzija += "</div>";
+                        recenzije += recenzija;
+                    }
+                }
+            }
+            $("#recenzije-container").html(recenzije);
+            $(`button[name="odobri-button"]`).click(function (e) {
+                let recenzent = e.target.id.split("-")[0];
+                let naziv = e.target.id.split("-")[1];
+                $.get(`/api/BazaProizvoda?naziv=${naziv}`, async function (data, status) {
+                    for (recenzija in data.ListaRecenzija) {
+                        if (data.ListaRecenzija[recenzija].Recenzent == recenzent) {
+                            data.ListaRecenzija[recenzija].Odobreno = true;
+                            break;
+                        }
+                    }
+                    await $.ajax({
+                        type: "PUT",
+                        url: "/api/BazaProizvoda",
+                        data: JSON.stringify(data),
+                        contentType: "application/json"
+
+                    })
+                    location.reload();
+                })
+            })
+            $(`button[name="odbi-button"]`).click(function (e) {
+                let recenzent = e.target.id.split("-")[0];
+                let naziv = e.target.id.split("-")[1];
+                $.get(`/api/BazaProizvoda?naziv=${naziv}`, async function (data, status) {
+                    for (recenzija in data.ListaRecenzija) {
+                        if (data.ListaRecenzija[recenzija].Recenzent == recenzent) {
+                            data.ListaRecenzija.splice(recenzija, 1);
+                            break;
+                        }
+                    }
+                    await $.ajax({
+                        type: "PUT",
+                        url: "/api/BazaProizvoda",
+                        data: JSON.stringify(data),
+                        contentType: "application/json"
+
+                    })
+                    location.reload();
+                })
+            })
+        })
+    })
+</script>

@@ -154,6 +154,7 @@
     <Content Include="Views\Admin\Recenzije.cshtml" />
     <Content Include="Views\Admin\Dodaj.cshtml" />
     <Content Include="Views\Admin\IzmenaKorisnika.cshtml" />
+    <Content Include="Views\Admin\IzmenaProizvoda.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
