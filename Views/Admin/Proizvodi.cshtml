@@ -44,10 +44,16 @@
                 let sortiranje = filterParams.get("sortiranje");
                 for (let i = 0; i < lista.length; i++) {
                     let changed = "nochange";
+                    if (status != "nista" && status == "dostupan") {
+                        $(`#status-select`).val(status);
+                    }
                     if (status != "nista" && status == "dostupan" && lista[i].StatusProizvoda != 0) {
 
                         changed = "change";
                         lista.splice(i, 1);
+                    }
+                    if (status != "nista" && status == "nedostupan") {
+                        $(`#status-select`).val(status);
                     }
                     if (status != "nista" && status == "nedostupan" && lista[i].StatusProizvoda != 1) {
 
@@ -62,21 +68,28 @@
                     switch (sortiranje) {
                         case "cena-rastuce":
                             lista.sort((a, b) => (a.Cena > b.Cena) ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                         case "cena-opadajuce":
                             lista.sort((a, b) => a.Cena < b.Cena ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                         case "datum-rastuce":
                             lista.sort((a, b) => new Date(a.Objavljen) > new Date(b.Objavljen) ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                         case "datum-opadajuce":
+
                             lista.sort((a, b) => new Date(a.Objavljen) < new Date(b.Objavljen) ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                         case "naziv-rastuce":
                             lista.sort((a, b) => a.Naziv > b.Naziv ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                         case "naziv-opadajuce":
                             lista.sort((a, b) => a.Naziv < b.Naziv ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                     }
                 }

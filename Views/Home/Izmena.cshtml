@@ -1,0 +1,77 @@
+﻿<div id="form-container" style="display: flex; flex-direction: column;justify-content:center; align-items:center; gap:10px;border:1px solid black; width:95%; padding:15px; margin: 10px;">
+    `<label style="font-size:1.5rem;width: 95%;"> Naslov: <input type="text" id="naslov-input" style="width:90%; font-size:1.5rem;padding: 10px" /></label>
+    <label style="font-size:1.5rem;width: 95%;"> Recenzija: <textarea id="textarea-input" rows=5 style="width:90%;font-size: 1.5rem; padding:10px;resize:none"></textarea></label>
+    <button id="save-button" style="font-size:1.5rem; padding:5px; width:50%;">Save</button>
+    <button id="nazad-button" style="font-size:1.5rem; padding:5px; width:50%;">Nazad</button>
+</div>
+<script>
+    $(window).on("load", function () {
+        let podaci = JSON.parse(sessionStorage.getItem("userData"));
+
+        if (!podaci || podaci.Uloga != 0) {
+            location.href = "/";
+        }
+        const naziv = location.pathname.split("/")[3];
+        if (!naziv) {
+            location.href = "/";
+        }
+        $.get(`/api/BazaProizvoda?naziv=${naziv}`, function (data, status) {
+            if (!data) {
+                location.href = "/";
+            }
+            let recenzija;
+            for (i in data.ListaRecenzija) {
+                if (data.ListaRecenzija[i].Recenzent == podaci.Korisnicko_ime) {
+                    recenzija = data.ListaRecenzija[i];
+                    $("#naslov-input").val(recenzija.Naslov);
+                    $("#textarea-input").val(recenzija.Sadrzaj);
+                    $("#nazad-button").click(function () {
+                        location.href = `/Home/Proizvod/${data.Naziv}`;
+                    });
+                    $("#save-button").click(async function () {
+                        let naslov = $("#naslov-input").val();
+                        let sadrzaj = $("#textarea-input").val();
+                        if (!naslov) {
+                            $("#naslov-input").css("border-color", "red");
+                            setTimeout(function () {
+                                $("#naslov-input").css("border-color", "black");
+                            }, 3000)
+                            return;
+                        }
+                        if (!sadrzaj) {
+                            $("#textarea-input").css("border-color", "red");
+                            setTimeout(function () {
+                                $("#textarea-input").css("border-color", "black");
+                            }, 3000)
+                            return;
+                        }
+                        const novaRecenzija = {
+                            Recenzent: podaci.Korisnicko_ime,
+                            Naslov: naslov,
+                            Sadrzaj: sadrzaj,
+                            Slika: "",
+                            Odobreno: false,
+                            Proizvod: data.Naziv
+                        }
+                        data.ListaRecenzija[i] = novaRecenzija;
+                        await $.ajax({
+                            type: "PUT",
+                            url: "/api/BazaProizvoda",
+                            data: JSON.stringify(data),
+                            contentType: "application/json"
+
+                        });
+                        location.href = `/Home/Proizvod/${data.Naziv}`;
+                    })
+                    break;
+                }
+            }
+            if (!recenzija && !recenzija.Odobreno) {
+                location.href = "/";
+            }
+            
+           
+        })
+
+    })
+</script>

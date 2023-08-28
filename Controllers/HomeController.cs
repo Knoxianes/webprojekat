@@ -17,5 +17,9 @@ namespace WebProjekat.Controllers
         {
             return View();
         }
+        public ActionResult Izmena(string naziv)
+        {
+            return View();
+        }
     }
 }

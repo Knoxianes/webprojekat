@@ -111,6 +111,7 @@
                         recenzija += `</div>`;
                         if (logedInUser && data.ListaRecenzija[i].Recenzent == logedInUser.Korisnicko_ime) {
                             recenzija += `<button id="obrisi-button" style="font-size:1.5rem; padding:5px; width: 25%">Obrisi</button>`;
+                            recenzija += `<button id="izmeni-button"  style="font-size:1.5rem; padding:5px; width: 25%">Izmeni</button>`;
                         }
                         recenzija += "</div>";
                         recenzije += recenzija;
@@ -134,6 +135,9 @@
                     });
                     location.reload();
 
+                });
+                $("#izmeni-button").click(function () {
+                    location.href = `/Home/Izmena/${data.Naziv}`;
                 })
 
 

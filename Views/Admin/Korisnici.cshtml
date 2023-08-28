@@ -50,24 +50,34 @@
                 const sortiranje = filterParams.get("sortiranje");
                 for (let i = 0; i < lista.length; i++) {
                     let changed = "nochange";
-                    if (ime && !lista[i].Ime.includes(ime)) {
+                    if (ime && !lista[i]?.Ime.includes(ime)) {
                         changed = "change";
-                          lista.splice(i, 1);
+                        lista.splice(i, 1);
+                        $(`input[name="ime-pretraga"]`).val(ime);
                     }
-                    if (prezime && !lista[i].Prezime.includes(prezime)) {
+                    if (prezime && !lista[i]?.Prezime.includes(prezime)) {
+                        changed = "change";
+                        lista.splice(i, 1);
+                        $(`input[name="prezime-pretraga"]`).val(prezime);
+                    }
+                    if (datum_od) {
+                        $(`input[name="datum-od"]`).val(datum_od);
+                    }
+                    if (datum_od && new Date(lista[i]?.Rodjendan) <= new Date(datum_od)) {
                         changed = "change";
                         lista.splice(i, 1);
                     }
-                    if (datum_od && new Date(lista[i].Rodjendan) <= new Date(datum_od)) {
+                    if (datum_do) {
+                        $(`input[name="datum-do"]`).val(datum_do);
+                    }
+                    if (datum_do && new Date(lista[i]?.Rodjendan) >= new Date(datum_do)) {
                         changed = "change";
                         lista.splice(i, 1);
                     }
-                    if (datum_do && new Date(lista[i].Rodjendan) >= new Date(datum_do)) {
-                        changed = "change";
-                        lista.splice(i, 1);
+                    if (uloga != "nista") {
+                        $("#uloga-select").val(uloga);
                     }
-                   
-                    if (uloga != "nista" && lista[i].Uloga != uloga) {
+                    if (uloga != "nista" && lista[i]?.Uloga != uloga) {
                         changed = "change";
                         lista.splice(i, 1);
                     }
@@ -79,21 +89,27 @@
                     switch (sortiranje) {
                         case "prezime-rastuce":
                             lista.sort((a, b) => (a.Prezime > b.Prezime) ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                         case "prezime-opadajuce":
                             lista.sort((a, b) => a.Prezime < b.Prezime ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                         case "datum-rastuce":
                             lista.sort((a, b) => new Date(a.Rodjendan) > new Date(b.Rodjendan) ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                         case "datum-opadajuce":
                             lista.sort((a, b) => new Date(a.Rodjendan) < new Date(b.Rodjendan) ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                         case "ime-rastuce":
                             lista.sort((a, b) => a.Ime > b.Ime ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                         case "ime-opadajuce":
                             lista.sort((a, b) => a.Ime < b.Ime ? 1 : -1);
+                            $(`select[name="sortiranje"]`).val(sortiranje);
                             break;
                     }
                 }

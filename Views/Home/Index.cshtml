@@ -53,21 +53,31 @@
                     const sortiranje = filterParams.get("sortiranje");
                     for (let i = 0; i < lista.length; i++) {
                         let changed = "nochange";
-                        if (pretraga && !lista[i].Naziv.includes(pretraga)) {
+                        if (pretraga && !lista[i]?.Naziv.includes(pretraga)) {
                             changed = "change";
                             lista.splice(i, 1);
+                            $(`input[name="pretraga"]`).val(pretraga);
                         }
-                        if (min && list[i].Cena < parseInt(min)) {
-                            changed = "change";
-                            lista.splice(i, 1);
+                        if (min) {
+                            $(`input[name="min"]`).val(parseInt(min));
                         }
-                        if (max && lista[i].Cena > parseInt(max)) {
+                        if (min && lista[i]?.Cena < parseInt(min)) {
                             changed = "change";
                             lista.splice(i, 1);
+                            
                         }
-                        if (grad != "nista" && lista[i].Grad != grad) {
+                        if (max) {
+                            $(`input[name="max"]`).val(parseInt(max));
+                        }
+                        if (max && lista[i]?.Cena > parseInt(max)) {
                             changed = "change";
                             lista.splice(i, 1);
+                           
+                        }
+                        if (grad != "nista" && lista[i]?.Grad != grad) {
+                            changed = "change";
+                            lista.splice(i, 1);
+                            $(`#grad-filter`).val(grad);
                         }
                         if (changed != "nochange") {
                             i--;
@@ -77,21 +87,27 @@
                         switch (sortiranje) {
                             case "cena-rastuce":
                                 lista.sort((a, b) => (a.Cena > b.Cena) ? 1 : -1);
+                                $(`select[name="sortiranje"]`).val(sortiranje);
                                 break;
                             case "cena-opadajuce":
                                 lista.sort((a, b) => a.Cena < b.Cena ? 1 : -1);
+                                $(`select[name="sortiranje"]`).val(sortiranje);
                                 break;
                             case "datum-rastuce":
                                 lista.sort((a, b) => new Date(a.Objavljen) > new Date(b.Objavljen) ? 1 : -1);
+                                $(`select[name="sortiranje"]`).val(sortiranje);
                                 break;
                             case "datum-opadajuce":
                                 lista.sort((a, b) => new Date(a.Objavljen) < new Date(b.Objavljen) ? 1 : -1);
+                                $(`select[name="sortiranje"]`).val(sortiranje);
                                 break;
                             case "naziv-rastuce":
                                 lista.sort((a, b) => a.Naziv > b.Naziv ? 1 : -1);
+                                $(`select[name="sortiranje"]`).val(sortiranje);
                                 break;
                             case "naziv-opadajuce":
                                 lista.sort((a, b) => a.Naziv < b.Naziv ? 1 : -1);
+                                $(`select[name="sortiranje"]`).val(sortiranje);
                                 break;
                         }
                     }
