@@ -51,7 +51,7 @@ namespace WebProjekat.Controllers
         }
 
 
-        private string dbPath = "C:\\Users\\strah\\OneDrive\\Dokumenti\\GitLab\\WebProjekat\\App_Data\\BazaKorisnika.json";
+        private string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "BazaKorisnika.json");
 
         private List<Korisnik> ProcitajBazu()
         {

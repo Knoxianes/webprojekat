@@ -37,10 +37,14 @@
                 }
                 lista = data;
                 let lista_gradova = `<option value="nista" style="font-size: 1.5rem;">Nista</option>`;
-                for (let j in lista) {
-                    if (lista[j].Kolicina > 0) {
-                        lista_gradova += `<option value=${lista[j].Grad} style="font-size:1.5rem;">${lista[j].Grad}</option>`
+                let listaGradova = [];
+                for (let grad in lista) {
+                    if (lista[grad].Kolicina > 0 && !listaGradova.includes(lista[grad].Grad)) {
+                        listaGradova.push(lista[grad].Grad);
                     }
+                }
+                for (let j in listaGradova) {
+                        lista_gradova += `<option value=${listaGradova[j]} style="font-size:1.5rem;">${listaGradova[j]}</option>`
                 }
                 $("#grad-filter").html(lista_gradova);
                 let filterUrl = location.search;
@@ -74,10 +78,13 @@
                             lista.splice(i, 1);
                            
                         }
+                        if (grad != "nista") {
+                            $(`#grad-filter`).val(grad);
+                        }
                         if (grad != "nista" && lista[i]?.Grad != grad) {
                             changed = "change";
                             lista.splice(i, 1);
-                            $(`#grad-filter`).val(grad);
+                           
                         }
                         if (changed != "nochange") {
                             i--;
@@ -116,7 +123,7 @@
                 let loggedin = sessionStorage.getItem("logedIn");
                 let logedInUser = JSON.parse(sessionStorage.getItem("userData"));
                 for (let proizvod = 0; proizvod < lista.length; proizvod++) {
-                    card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 10px; width:300px; border: 1px solid black; padding: 15px;${lista[proizvod].Kolicina == 0 ? "display: none;" : ""}">`;
+                    card = `<div style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 10px; width:250px; border: 1px solid black; padding: 15px;${lista[proizvod].Kolicina == 0 ? "display: none;" : ""}">`;
                     card += `<a href="/Home/Proizvod/${lista[proizvod].Naziv}"  style="display: flex;flex-direction: column; justify-content: center; align-items: center; gap: 6px; text-decoration: none; color: black;">`;
                     card += `<img src=${lista[proizvod].Slika} style="width:200px; height: 200px;object-fit: contain;"></img>`;
                     card += `<p style="font-size: 1.5rem;">Naziv: ${lista[proizvod].Naziv}</p>`;

@@ -14,6 +14,7 @@ namespace WebProjekat.Controllers
     {
         public List<Proizvod> Get()
         {
+
             return ProcitajBazu();
         }
         public Proizvod Get(string naziv)
@@ -49,7 +50,7 @@ namespace WebProjekat.Controllers
         }
 
 
-        private string dbPath = "C:\\Users\\strah\\OneDrive\\Dokumenti\\GitLab\\WebProjekat\\App_Data\\BazaProizvoda.json";
+        private string dbPath =Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"App_Data","BazaProizvoda.json");
 
         private List<Proizvod> ProcitajBazu()
         {
